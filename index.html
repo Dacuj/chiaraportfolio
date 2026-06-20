@@ -15,102 +15,84 @@
     --ink:#0e0e0e; --paper:#f3efe4; --bone:#fbf9f2;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;height:100%;width:100%;overflow:hidden;}
-  body{background:var(--ink);color:var(--ink);
-    font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  html,body{margin:0;height:100%;width:100%;overflow:hidden;background:#0e0e0e;}
+  body{color:#fff;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
 
-  /* ===== linear horizontal scroller ===== */
-  #track{display:flex;height:100%;width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
-  #track::-webkit-scrollbar{display:none;}
-  .panel{flex:0 0 100vw;height:100%;position:relative;overflow:hidden;background:#000;}
-
-  /* film grain (sober) */
-  .panel::after{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;mix-blend-mode:overlay;opacity:.05;
+  /* color-wash background of the "film" */
+  #bg{position:fixed;inset:0;z-index:0;background:#0e0e0e;transition:background-color .15s linear;}
+  #bg::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
-  /* ===== brand mark ===== */
+  /* horizontal transport = the camera moving through the reel */
+  #track{position:relative;z-index:1;height:100%;width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
+  #track::-webkit-scrollbar{display:none;}
+  #stage{position:relative;height:100%;}
+
+  /* a "beat" = a moment in the journey (photo / video / word) */
+  .beat{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);will-change:transform,opacity;}
+  .beat.hidden{visibility:hidden;}
+
+  /* ---- photo: shown whole, never cropped ---- */
+  .ph{position:relative;display:inline-block;line-height:0;}
+  .ph img{display:block;width:auto;height:auto;max-height:70vh;max-width:48vw;
+    box-shadow:0 34px 80px rgba(0,0,0,.5);}
+  .beat.hero  .ph img{max-height:84vh;max-width:54vw;}
+  .beat.land  .ph img{max-height:60vh;max-width:78vw;}
+  .beat.small .ph img{max-height:52vh;max-width:38vw;}
+
+  /* burned-in film subtitle */
+  .ph.cap::after,.vframe.cap::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;pointer-events:none;
+    background:linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0));}
+  .sub{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);z-index:3;width:92%;text-align:center;
+    color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:500;line-height:1.3;
+    font-size:clamp(15px,1.9vw,25px);letter-spacing:.005em;
+    text-shadow:0 0 5px rgba(0,0,0,.5), 1.4px 1.4px 0 #000, -1.4px 1.4px 0 #000, 1.4px -1.4px 0 #000, -1.4px -1.4px 0 #000;
+    opacity:0;transition:opacity .6s ease .15s, transform .6s ease .15s;}
+  .beat.live .sub{opacity:1;}
+  .sub .nm{color:var(--yellow);font-weight:700;}
+
+  /* ---- video: reliable thumbnail, always clickable ---- */
+  .vframe{position:relative;width:52vw;max-width:760px;aspect-ratio:16/9;cursor:pointer;overflow:hidden;
+    background:#111;box-shadow:0 34px 80px rgba(0,0,0,.5);}
+  .vframe img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.15) contrast(1.03);}
+  .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:clamp(64px,6.5vw,92px);aspect-ratio:1;border-radius:50%;background:var(--red);
+    border:3px solid var(--bone);display:flex;align-items:center;justify-content:center;
+    color:var(--bone);font-size:clamp(20px,2vw,28px);padding-left:5px;z-index:2;
+    transition:transform .3s, background .3s;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+  .vframe:hover .vplay{transform:translate(-50%,-50%) scale(1.1);background:var(--blue);}
+  .vtag{position:absolute;top:14px;left:14px;z-index:3;font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:.22em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.45);padding:5px 9px;}
+
+  /* ---- word / intertitle ---- */
+  .beat.word{text-align:center;}
+  .word b{display:block;font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.82;
+    font-size:clamp(54px,11vw,168px);letter-spacing:0;transition:letter-spacing 1s cubic-bezier(.2,.7,.2,1);}
+  .beat.live .word b{letter-spacing:.03em;}
+  .word .lab{font-family:'Space Mono',monospace;font-size:clamp(10px,1.2vw,13px);letter-spacing:.32em;
+    text-transform:uppercase;opacity:.72;margin-bottom:18px;color:inherit;}
+  .word .lab a{color:inherit;}
+
+  /* ---- handdrawn logo ---- */
+  .beat.logo{text-align:center;}
+  .logo img{height:clamp(74px,15vh,150px);width:auto;filter:invert(1);}
+  .logo .lab{margin-top:22px;font-family:'Space Mono',monospace;font-size:clamp(10px,1.3vw,14px);
+    letter-spacing:.34em;text-transform:uppercase;color:#fff;opacity:.85;}
+  .logo .lab b{color:var(--red);}
+
+  /* handdrawn doodles draw-in */
+  .doodle{position:absolute;pointer-events:none;overflow:visible;z-index:4;}
+  .doodle>svg{display:block;width:100%;height:auto;}
+  .doodle path,.doodle line,.doodle polyline{stroke-dasharray:1;stroke-dashoffset:1;
+    transition:stroke-dashoffset 1.3s ease .2s;}
+  .beat.live .doodle path,.beat.live .doodle line,.beat.live .doodle polyline{stroke-dashoffset:0;}
+
+  /* ===== fixed UI ===== */
   #brand{position:fixed;top:max(16px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left));z-index:320;
     pointer-events:none;mix-blend-mode:difference;color:#fff;}
   #brand .n{font-family:'Oswald',sans-serif;font-size:clamp(14px,1.5vw,19px);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
   #brand .r{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.28em;text-transform:uppercase;opacity:.9;margin-top:3px;}
-
-  /* progress bar */
   #prog{position:fixed;top:0;left:0;height:4px;width:0;z-index:330;background:var(--red);transition:width .12s linear;}
-
-  /* ===== scroll-reveal ===== */
-  .reveal{opacity:0;transform:translateY(24px);
-    transition:opacity .8s ease var(--d,0s), transform .9s cubic-bezier(.2,.75,.2,1) var(--d,0s);}
-  .panel.in .reveal{opacity:1;transform:none;}
-
-  /* handdrawn doodles draw-in */
-  .doodle{position:absolute;pointer-events:none;overflow:visible;z-index:18;}
-  .doodle>svg{display:block;width:100%;height:auto;}
-  .doodle path,.doodle line,.doodle polyline{stroke-dasharray:1;stroke-dashoffset:1;
-    transition:stroke-dashoffset 1.2s ease var(--dd,.25s);}
-  .panel.in .doodle path,.panel.in .doodle line,.panel.in .doodle polyline{stroke-dashoffset:0;}
-
-  /* =====================================================================
-     FILM CARD — one photo per screen, cinematic colored letterbox bars,
-     film-subtitle styled captions. Per-panel theme via CSS vars.
-     ===================================================================== */
-  .film{ --bart:clamp(46px,7.5vh,74px); --barb:clamp(104px,18vh,158px);
-    --top:#0e0e0e; --bot:#0e0e0e; --tink:#f3efe4; --acc:#e2231a;
-    position:relative;overflow:hidden;background:#000;}
-  .film .img{position:absolute;left:0;right:0;top:var(--bart);bottom:var(--barb);overflow:hidden;}
-  .film .img img{width:100%;height:100%;object-fit:cover;object-position:var(--pos,center 35%);
-    transform:scale(1.001);transition:transform 8s ease-out;}
-  .panel.in.film .img img{transform:scale(1.075);}
-  .film .img::after{content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(0deg,rgba(0,0,0,.5),rgba(0,0,0,0) 30%);}
-
-  .film .barT,.film .barB{position:absolute;left:0;width:100%;z-index:16;display:flex;}
-  .film .barT{top:0;height:var(--bart);background:var(--top);color:var(--tink);
-    align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,52px);}
-  .film .barB{bottom:0;height:var(--barb);background:var(--bot);color:var(--tink);
-    align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,52px);gap:18px;}
-  .film .kick{font-family:'Space Mono',monospace;font-size:clamp(9px,1.1vw,12px);letter-spacing:.28em;text-transform:uppercase;}
-  .film .idx{font-family:'Space Mono',monospace;font-size:clamp(9px,1.1vw,12px);letter-spacing:.18em;opacity:.85;}
-  .film .ftitle{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.86;letter-spacing:.01em;
-    font-size:clamp(28px,5.4vw,74px);color:var(--acc);}
-  .film .fcat{font-family:'Space Mono',monospace;font-size:clamp(9px,1vw,12px);letter-spacing:.2em;text-transform:uppercase;
-    text-align:right;white-space:nowrap;opacity:.9;}
-
-  /* pois texture option on bottom bar */
-  .film .barB.pois{background-image:radial-gradient(rgba(255,255,255,.16) 22%,transparent 24%);
-    background-size:clamp(20px,2.4vw,30px) clamp(20px,2.4vw,30px);}
-
-  /* FILM SUBTITLE — classic centered white caption with outline */
-  .subtitle{position:absolute;left:50%;bottom:calc(var(--barb) + clamp(16px,3vh,30px));transform:translateX(-50%);
-    width:min(88%,920px);text-align:center;z-index:17;color:#fff;
-    font-family:'Space Grotesk',sans-serif;font-weight:500;line-height:1.32;
-    font-size:clamp(15px,2.05vw,27px);
-    text-shadow:0 0 5px rgba(0,0,0,.55), 1.4px 1.4px 0 #000, -1.4px 1.4px 0 #000, 1.4px -1.4px 0 #000, -1.4px -1.4px 0 #000;}
-  .subtitle .nm{color:var(--acc,#f5c400);}
-
-  /* play button (video panels) */
-  .film .media{position:absolute;inset:0;cursor:pointer;z-index:14;}
-  .vplay{position:absolute;top:calc(50% - var(--barb)/2 + var(--bart)/2);left:50%;transform:translate(-50%,-50%);
-    width:clamp(64px,7vw,98px);aspect-ratio:1;border-radius:50%;background:var(--acc);
-    border:3px solid var(--bone);display:flex;align-items:center;justify-content:center;
-    color:var(--bone);font-size:clamp(20px,2vw,30px);padding-left:5px;z-index:15;
-    transition:transform .3s, background .3s;box-shadow:0 10px 28px rgba(0,0,0,.4);}
-  .film .media:hover .vplay{transform:translate(-50%,-50%) scale(1.1);}
-
-  /* ===== COVER ===== */
-  .cover .img{bottom:clamp(150px,26vh,250px);}
-  .cover .barB{height:clamp(150px,26vh,250px);background:var(--paper);color:var(--ink);
-    flex-direction:column;justify-content:center;gap:10px;}
-  .cover .logo{height:clamp(56px,11vh,104px);width:auto;mix-blend-mode:multiply;}
-  .cover .csub{font-family:'Space Mono',monospace;font-size:clamp(10px,1.3vw,14px);letter-spacing:.34em;text-transform:uppercase;}
-  .cover .csub b{color:var(--red);}
-
-  /* ===== END ===== */
-  .end{background:var(--blue);display:grid;place-items:center;text-align:center;color:var(--bone);}
-  .end .fin{font-family:'Anton',sans-serif;font-size:clamp(80px,20vw,260px);line-height:.8;color:var(--yellow);}
-  .end .em{font-family:'Space Mono',monospace;letter-spacing:.22em;text-transform:uppercase;margin-top:22px;font-size:clamp(11px,1.4vw,15px);}
-  .end .em a{color:var(--bone);}
-
-  /* ===== scroll hint ===== */
   #hint{position:fixed;right:22px;bottom:max(16px,env(safe-area-inset-bottom));z-index:300;font-family:'Space Mono',monospace;font-size:11px;
     letter-spacing:.22em;text-transform:uppercase;color:#fff;opacity:.75;transition:opacity .5s;pointer-events:none;mix-blend-mode:difference;}
   #hint.gone{opacity:0;}
@@ -125,26 +107,26 @@
   #focus .meta a{color:inherit;opacity:.85;margin-left:12px;}
   #focus .close{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border:2px solid var(--bone);background:var(--red);color:#fff;font-size:21px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
-  /* ================= MOBILE ================= */
   @media (max-width:760px){
-    .film{ --barb:clamp(120px,20vh,170px); }
-    .film .ftitle{font-size:clamp(30px,9vw,52px);}
-    .subtitle{width:90%;font-size:clamp(15px,4.4vw,22px);}
-    .film .fcat{display:none;}
-    .cover .barB{height:clamp(140px,24vh,200px);}
+    .ph img{max-height:54vh;max-width:84vw;}
+    .beat.hero .ph img{max-height:64vh;max-width:88vw;}
+    .beat.land .ph img{max-height:42vh;max-width:92vw;}
+    .beat.small .ph img{max-height:42vh;max-width:70vw;}
+    .vframe{width:88vw;}
+    .sub{font-size:clamp(14px,4vw,20px);}
     #focus .meta{display:none;}
   }
   @media (prefers-reduced-motion:reduce){
-    .reveal{transition:none;opacity:1;transform:none;}
-    .panel.in.film .img img{transform:none;}
     .doodle path,.doodle line,.doodle polyline{transition:none;stroke-dashoffset:0;}
+    .word b{transition:none;}
   }
 </style>
 </head>
 <body>
 
+<div id="bg"></div>
 <div id="prog"></div>
-<div id="track"></div>
+<div id="track"><div id="stage"></div></div>
 
 <div id="brand"><div class="n">chiara cucciardi</div><div class="r">attrice · roma</div></div>
 <div id="hint">scorri &rarr;</div>
@@ -159,10 +141,12 @@
 
 <script>
 /* =====================================================================
-   CHIARA CUCCIARDI — portfolio, scroll lineare orizzontale.
-   Una foto per schermata, stile Nouvelle Vague: bande cinematografiche
-   colorate per tema, titoli condensati (Anton) e didascalie in stile
-   SOTTOTITOLI da film. Pensato per crescere: aggiungi voci in SECTIONS.
+   CHIARA CUCCIARDI — una pellicola da scorrere.
+   Non pagine: un viaggio. Scorrendo, la "camera" attraversa una lunga
+   sequenza; le foto galleggiano dentro e fuori (entrano, si avvicinano,
+   sfumano), i colori cambiano come scene, appaiono parole-intertitolo e
+   disegni a mano. Sottotitoli "stampati" nel fotogramma, stile film.
+   Per aggiungere materiale: inserisci voci in BEATS.
    ===================================================================== */
 
   const VIDEOS = [
@@ -173,92 +157,96 @@
     { id:'SLc8H1eY58Y', title:'Backstage', cat:'backstage' },
   ];
 
-  /* palette dei temi (bande, testo banda, accento titolo) — stile poster Godard */
-  const THEMES = {
-    tricolore:{ top:'#1733cc', bot:'#e2231a', tink:'#fffaf0', acc:'#ffffff' },
-    red:      { top:'#e2231a', bot:'#e2231a', tink:'#fff4e0', acc:'#1733cc' },
-    blue:     { top:'#1733cc', bot:'#1733cc', tink:'#fff7e6', acc:'#f5c400' },
-    ochre:    { top:'#c5872a', bot:'#c5872a', tink:'#1c1400', acc:'#11543a' },
-    pink:     { top:'#b9485f', bot:'#b9485f', tink:'#fff4ea', acc:'#1733cc' },
-    lavender: { top:'#5f5b8a', bot:'#5f5b8a', tink:'#ffffff', acc:'#f5c400' },
-    green:    { top:'#39481f', bot:'#39481f', tink:'#f3efe4', acc:'#e9b84a' },
-    noir:     { top:'#0e0e0e', bot:'#0e0e0e', tink:'#f3efe4', acc:'#e2231a' },
-  };
-
-  /* libreria di elementi disegnati a mano (draw-in) */
   const DO = {
     star:(c)=>`<svg class="doodle" viewBox="0 0 120 120" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M60 8l16 34 38 4-28 26 8 38-34-20-34 20 8-38-28-26 38-4z"/></svg>`,
     circle:(c)=>`<svg class="doodle" viewBox="0 0 200 120" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"><path pathLength="1" d="M100 8C45 6 14 34 12 62c-3 33 44 52 92 50 41-2 86-22 84-54C186 27 142 9 96 11"/></svg>`,
     arrow:(c)=>`<svg class="doodle" viewBox="0 0 160 120" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M10 14C44 70 86 96 142 100"/><path pathLength="1" d="M112 96l32 6-12-30"/></svg>`,
     underline:(c)=>`<svg class="doodle" viewBox="0 0 320 40" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><path pathLength="1" d="M6 22C70 10 150 30 230 16c36-6 70-8 86-2"/></svg>`,
   };
-  const dood=(k,c,css)=>`<div class="doodle reveal" style="${css||''}">${DO[k](c)}</div>`;
 
-  /* ===== SECTIONS — una foto per schermata (riordina/aggiungi liberamente) ===== */
-  const SECTIONS = [
-    { type:'cover', photo:'assets/shot_17.13.40.webp', logo:'assets/shot_17.13.21.webp',
-      pos:'center 28%', sub:'attrice · roma · cinema / teatro' },
+  /* ===== BEATS — la sequenza del viaggio (riordina / aggiungi) =====
+     gap: spazio (in schermate) prima del beat successivo
+     bg : colore della scena (transizione morbida tra un beat e l'altro)
+     y  : scostamento verticale (vh)   rot: rotazione (deg)
+     d  : disegno a mano [tipo, colore, css-posizione]                    */
+  const BEATS = [
+    { t:'logo', src:'assets/shot_17.13.21.webp', lab:'attrice · roma · <b>cinema</b> / teatro',
+      gap:1.05, bg:'#0e0e0e' },
 
-    { type:'shot', photo:'assets/scale.webp', theme:'tricolore', film:'bande à part',
-      kick:'editorial', cat:'roma · 2026', pos:'center 30%',
-      sub:'«non si sfugge alla gravità — eppure salgo.»', doodle:['arrow','#fff','right:7%;bottom:calc(var(--barb) + 4%);width:90px'] },
+    { t:'photo', src:'assets/shot_17.13.40.webp', size:'hero', y:-3, rot:-1,
+      sub:'CHIARA CUCCIARDI — attrice', gap:1.25, bg:'#39481f' },
 
-    { type:'clip', v:0, theme:'noir', film:'bobine',
-      kick:'showreel', cat:'montaggio · 2026', sub:'«guarda — e dimmi cosa vedi.»' },
+    { t:'word', lab:'capitolo uno', text:'BANDE<br>À PART', color:'#1733cc',
+      gap:0.78, bg:'#0e0e0e' },
 
-    { type:'shot', photo:'assets/IMG_7800.webp', theme:'red', film:'une femme est une femme',
-      kick:'dialogo', cat:'fotoromanzo', pos:'center 18%',
-      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!', barPois:true },
+    { t:'photo', src:'assets/scale.webp', y:-2, rot:1.2,
+      sub:'«non si sfugge alla gravità — eppure salgo.»', gap:1.15, bg:'#16236e',
+      d:['arrow','#ffffff','right:-8%;bottom:8%;width:90px'] },
 
-    { type:'shot', photo:'assets/IMG_7801.webp', theme:'blue', film:'pierrot le fou',
-      kick:'sogno', cat:'studio · blu', pos:'center 45%',
-      sub:'«sono una pietra con il sogno di un battito.»', doodle:['star','#f5c400','right:8%;top:calc(var(--bart) + 6%);width:84px'] },
+    { t:'video', v:0, sub:'«guarda — e dimmi cosa vedi.»', gap:1.15, bg:'#0e0e0e' },
 
-    { type:'clip', v:1, theme:'noir', film:'le mépris',
-      kick:'cinema', cat:'scena', sub:'«sei la mia ferita santa.»' },
+    { t:'word', lab:'una donna è una donna', text:'UNE<br>FEMME', color:'#e2231a',
+      gap:0.78, bg:'#f3efe4', dark:true },
 
-    { type:'shot', photo:'assets/IMG_7803.webp', theme:'ochre', film:'à bout de souffle',
-      kick:'esistenza', cat:'roma · portico', pos:'center 35%',
-      sub:'<span class="nm">—</span> chi sono io?', doodle:['circle','#11543a','left:6%;top:calc(var(--bart) + 8%);width:150px'] },
+    { t:'photo', src:'assets/IMG_7800.webp', y:0, rot:-1.4,
+      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!', gap:1.2, bg:'#b5160f' },
 
-    { type:'shot', photo:'assets/IMG_7797.webp', theme:'pink', film:'vivre sa vie',
-      kick:'ritratto', cat:'handdrawn', pos:'center 22%',
-      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»' },
+    { t:'word', lab:'pierrot le fou', text:'★', color:'#f5c400',
+      gap:0.6, bg:'#15259e' },
 
-    { type:'clip', v:2, theme:'red', film:'le petit soldat',
-      kick:'monologo · teatro', cat:'voce', sub:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»', barPois:true },
+    { t:'photo', src:'assets/IMG_7801.webp', y:-2, rot:1,
+      sub:'«sono una pietra con il sogno di un battito.»', gap:1.15, bg:'#1733cc',
+      d:['star','#f5c400','right:-6%;top:4%;width:84px'] },
 
-    { type:'shot', photo:'assets/IMG_7792.webp', theme:'lavender', film:'alphaville',
-      kick:'poesia', cat:'collage', pos:'center 40%',
-      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»' },
+    { t:'video', v:1, sub:'«sei la mia ferita santa.»', gap:1.15, bg:'#0e0e0e' },
 
-    { type:'shot', photo:'assets/shot_17.14.34.webp', theme:'green', film:'théâtre',
-      kick:'teatro · point zero', cat:'concept', pos:'center 30%',
-      sub:'<span class="nm">—</span> chi tiene i fili?', doodle:['star','#e9b84a','left:9%;bottom:calc(var(--barb) + 5%);width:70px'] },
+    { t:'word', lab:'à bout de souffle', text:'CHI<br>SONO?', color:'#c5872a',
+      gap:0.78, bg:'#0e0e0e' },
 
-    { type:'shot', photo:'assets/IMG_3657.jpg', theme:'noir', film:'le cinéma',
-      kick:'fotogramma', cat:'still · interno notte', pos:'center 30%',
-      sub:'«and it came with the rain — the surface remains unbroken.»' },
+    { t:'photo', src:'assets/IMG_7803.webp', y:-2, rot:-1,
+      sub:'<span class="nm">—</span> chi sono io?', gap:1.1, bg:'#b07522',
+      d:['circle','#11543a','left:-8%;top:2%;width:150px'] },
 
-    { type:'shot', photo:'assets/tenda.webp', theme:'lavender', film:'la pluie',
-      kick:'fotografia', cat:'luce', pos:'center 35%',
-      sub:'«con la pioggia — la superficie resta intatta.»' },
+    { t:'photo', src:'assets/IMG_7797.webp', y:0, rot:1.3,
+      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»', gap:1.15, bg:'#a83f54' },
 
-    { type:'clip', v:4, theme:'green', film:'backstage',
-      kick:'dietro le quinte', cat:'making of', sub:'«e venne con la pioggia.»' },
+    { t:'video', v:2, sub:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»', gap:1.15, bg:'#0e0e0e' },
 
-    { type:'shot', photo:'assets/chiarabg.webp', theme:'noir', film:'symphonia ix',
-      kick:'diario', cat:'pietra · germoglio', pos:'center 25%',
-      sub:'«sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»' },
+    { t:'word', lab:'alphaville', text:'POESIA', color:'#cfc9ff',
+      gap:0.7, bg:'#4b4878' },
 
-    { type:'shot', photo:'assets/sgab.webp', theme:'tricolore', film:'une bande à part',
-      kick:'scena', cat:'baia', pos:'center 30%',
-      sub:'«implorammo il cielo un miracolo.»' },
+    { t:'photo', src:'assets/IMG_7792.webp', size:'land', y:-2, rot:-1,
+      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»', gap:1.2, bg:'#5f5b8a' },
 
-    { type:'end', mail:'cleanvillagesrl@gmail.com' },
+    { t:'word', lab:'théâtre · point zero', text:'I FILI', color:'#e9b84a',
+      gap:0.7, bg:'#2c3a16' },
+
+    { t:'photo', src:'assets/shot_17.14.34.webp', size:'hero', y:-2, rot:1,
+      sub:'<span class="nm">—</span> chi tiene i fili?', gap:1.2, bg:'#39481f',
+      d:['star','#e9b84a','left:-7%;bottom:10%;width:70px'] },
+
+    { t:'photo', src:'assets/IMG_3657.jpg', size:'land', y:-2, rot:-1,
+      sub:'«and it came with the rain — the surface remains unbroken.»', gap:1.15, bg:'#0e0e0e' },
+
+    { t:'photo', src:'assets/tenda.webp', y:-2, rot:1,
+      sub:'«con la pioggia — la superficie resta intatta.»', gap:1.1, bg:'#5f5b8a' },
+
+    { t:'photo', src:'assets/chiarabg.webp', y:-2, rot:-1.2,
+      sub:'«sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»', gap:1.1, bg:'#0e0e0e' },
+
+    { t:'photo', src:'assets/sgab.webp', size:'small', y:6, rot:2,
+      sub:'«implorammo il cielo un miracolo.»', gap:1.05, bg:'#16236e' },
+
+    { t:'video', v:4, sub:'«e venne con la pioggia.»', gap:1.15, bg:'#2c3a16' },
+
+    { t:'word', lab:'contatti — cleanvillagesrl@gmail.com', text:'FIN', color:'#f5c400',
+      gap:0.8, bg:'#1733cc', mail:'cleanvillagesrl@gmail.com',
+      d:['underline','#f5c400','left:50%;bottom:14%;width:min(38vw,400px);transform:translateX(-50%)'] },
   ];
 
+  const stage = document.getElementById('stage');
   const track = document.getElementById('track');
+  const bg    = document.getElementById('bg');
   const hint  = document.getElementById('hint');
   const prog  = document.getElementById('prog');
   const focusEl=document.getElementById('focus'), focusFrame=document.getElementById('focusFrame'),
@@ -266,84 +254,103 @@
 
   const isFile = location.protocol === 'file:';
   const embedSrc = id => { const s='https://www.youtube.com/embed/'+id+'?autoplay=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3'; return isFile?s:s+'&origin='+encodeURIComponent(location.origin); };
-  const thumb = id => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
-  const thumbF = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
-  const FILM = new Set(['shot','clip']);
-  const filmTotal = SECTIONS.filter(s=>FILM.has(s.type)).length;
-  let filmIdx = 0;
-
-  function themeVars(t){ const c=THEMES[t]||THEMES.noir;
-    return `--top:${c.top};--bot:${c.bot};--tink:${c.tink};--acc:${c.acc};`; }
-
-  function bars(s, idxStr){
-    const pois = s.barPois ? ' pois' : '';
-    return `<div class="barT reveal"><span class="kick">${s.kick||''}</span><span class="idx">${idxStr}</span></div>
-      <div class="barB${pois}">
-        <div class="ftitle reveal">${s.film||''}</div>
-        <div class="fcat reveal" style="--d:.08s">${s.cat||''}<br>chiara cucciardi</div>
-      </div>`;
+  /* reliable YouTube cover: hqdefault always exists; upgrade to maxres if available */
+  function setThumb(img,id){
+    img.src='https://i.ytimg.com/vi/'+id+'/hqdefault.jpg';
+    const hi=new Image();
+    hi.onload=()=>{ if(hi.naturalWidth>=1000) img.src=hi.src; };
+    hi.src='https://i.ytimg.com/vi/'+id+'/maxresdefault.jpg';
   }
 
-  SECTIONS.forEach(s => {
-    const sec = document.createElement('section');
-    sec.className = 'panel';
-    let html='';
+  /* build beats */
+  const beats = [];
+  BEATS.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'beat ' + (b.size?('photo '+b.size):'') ;
+    let inner = '';
 
-    if (s.type === 'cover'){
-      sec.classList.add('film','cover');
-      sec.style.cssText = themeVars('noir') + `--pos:${s.pos||'center 30%'};`;
-      html = `<div class="img"><img src="${s.photo}" alt="Chiara Cucciardi"></div>
-        <div class="barT reveal"><span class="kick">portfolio</span><span class="idx">mmxxvi · 16mm</span></div>
-        <div class="barB reveal" style="--d:.08s">
-          <img class="logo" src="${s.logo}" alt="Chiara Cucciardi">
-          <div class="csub">attrice · roma · <b>cinema</b> / teatro</div>
-        </div>`;
+    if (b.t==='logo'){
+      el.classList.add('logo');
+      inner = `<img src="${b.src}" alt="Chiara Cucciardi"><div class="lab">${b.lab||''}</div>`;
     }
-    else if (s.type === 'shot'){
-      filmIdx++;
-      const idxStr = String(filmIdx).padStart(2,'0')+' / '+String(filmTotal).padStart(2,'0');
-      sec.classList.add('film');
-      sec.style.cssText = themeVars(s.theme) + `--pos:${s.pos||'center 35%'};`;
-      html = `<div class="img"><img src="${s.photo}" alt="" onerror="this.style.opacity=.15"></div>`
-        + (s.doodle?dood(s.doodle[0],s.doodle[1],s.doodle[2]+';--d:.45s'):'')
-        + `<p class="subtitle reveal" style="--d:.25s">${s.sub||''}</p>`
-        + bars(s, idxStr);
+    else if (b.t==='word'){
+      el.classList.add('word');
+      if(b.dark) el.style.color='#0e0e0e';
+      inner = (b.lab?`<div class="lab">${b.lab}</div>`:'')
+            + `<b style="color:${b.color||'#fff'}">${b.text}</b>`
+            + (b.mail?`<div class="lab" style="margin-top:18px"><a href="mailto:${b.mail}" style="color:inherit">${b.lab||''}</a></div>`:'');
+      if(b.mail) inner = `<b style="color:${b.color}">${b.text}</b>`
+            + `<div class="lab" style="margin-top:20px"><a href="mailto:${b.mail}" style="color:#fff">${b.lab}</a></div>`;
     }
-    else if (s.type === 'clip'){
-      filmIdx++;
-      const idxStr = String(filmIdx).padStart(2,'0')+' / '+String(filmTotal).padStart(2,'0');
-      const v = VIDEOS[s.v];
-      sec.classList.add('film');
-      sec.style.cssText = themeVars(s.theme) + `--pos:center 30%;`;
-      html = `<div class="img"><img src="${thumb(v.id)}" onerror="this.onerror=null;this.src='${thumbF(v.id)}'" alt=""></div>
-        <div class="media" data-vi="${s.v}"><div class="vplay">&#9654;</div></div>
-        <p class="subtitle reveal" style="--d:.25s">${s.sub||''}</p>`
-        + bars(s, idxStr);
+    else if (b.t==='photo'){
+      el.classList.add('photo');
+      inner = `<div class="ph ${b.sub?'cap':''}"><img src="${b.src}" alt="" onerror="this.style.opacity=.15">
+        ${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>`;
     }
-    else if (s.type === 'end'){
-      sec.classList.add('end');
-      html = `<div>
-          <div class="fin reveal">fin</div>
-          ${dood('underline','#f5c400','left:50%;bottom:26%;width:min(40vw,420px);transform:translateX(-50%);--d:.35s')}
-          ${dood('star','#f5c400','left:12%;top:10%;width:64px;--d:.3s')}
-          <div class="em reveal" style="--d:.18s">contatti — <a href="mailto:${s.mail}">${s.mail}</a></div>
-        </div>`;
+    else if (b.t==='video'){
+      const v=VIDEOS[b.v];
+      el.classList.add('video');
+      inner = `<div class="vframe ${b.sub?'cap':''}" data-vi="${b.v}">
+          <img alt=""><div class="vtag">${v.cat}</div><div class="vplay">&#9654;</div>
+          ${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>`;
     }
 
-    sec.innerHTML = html;
-    sec.querySelectorAll('[data-vi]').forEach(el => el.addEventListener('click', () => openFocus(VIDEOS[+el.dataset.vi])));
-    track.appendChild(sec);
+    if (b.d) inner += `<div class="doodle" style="${b.d[2]}">${DO[b.d[0]](b.d[1])}</div>`;
+    el.innerHTML = inner;
+    el.style.setProperty('--rot', (b.rot||0));
+    stage.appendChild(el);
+    const vf = el.querySelector('.vframe'); if(vf){ setThumb(vf.querySelector('img'), VIDEOS[b.v].id); }
+    el.querySelectorAll('[data-vi]').forEach(x => x.addEventListener('click', () => { if(!dragMoved) openFocus(VIDEOS[+x.dataset.vi]); }));
+    beats.push({ ...b, el, cx:0, vis:false });
   });
 
-  const panels = [...track.children];
+  /* layout along the timeline */
+  function layout(){
+    const vw = window.innerWidth;
+    let cur = vw*0.5, last = cur;
+    beats.forEach(b=>{ b.cx = cur; b.el.style.left = cur+'px'; last = cur; cur += (b.gap||0.95)*vw; });
+    stage.style.width = (last + vw*0.5) + 'px';
+  }
 
-  /* ===== scroll-reveal (root = track, horizontal) ===== */
-  const io = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
-  }, { root:track, threshold:0.2 });
-  panels.forEach(p=>io.observe(p));
-  requestAnimationFrame(()=>panels[0]&&panels[0].classList.add('in'));
+  /* hex color helpers for the scene wash */
+  const hex = h => { h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; };
+  const COL = BEATS.map(b=>hex(b.bg||'#0e0e0e'));
+  const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
+  function washAt(center){
+    // find segment by cx
+    let i=0; while(i<beats.length-1 && center>beats[i+1].cx) i++;
+    const a=beats[i], b=beats[Math.min(i+1,beats.length-1)];
+    const span=Math.max(1,b.cx-a.cx), t=Math.max(0,Math.min(1,(center-a.cx)/span));
+    const ca=COL[i], cb=COL[Math.min(i+1,beats.length-1)];
+    return `rgb(${lerp(ca[0],cb[0],t)},${lerp(ca[1],cb[1],t)},${lerp(ca[2],cb[2],t)})`;
+  }
+
+  const smooth=(e0,e1,x)=>{ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); };
+
+  /* the journey render: per-beat fade / scale / parallax driven by scroll */
+  function render(){
+    const vw=track.clientWidth, sl=track.scrollLeft, center=sl+vw/2;
+    bg.style.backgroundColor = washAt(center);
+    const ms = track.scrollWidth - vw;
+    prog.style.width = (ms>0? sl/ms*100 : 0) + '%';
+    if(sl>40) hint.classList.add('gone');
+
+    for(const b of beats){
+      const n = (b.cx - center)/vw;               // -1 entering from left .. +1 exiting right
+      const an = Math.abs(n);
+      if(an>1.05){ if(b.vis){ b.el.classList.add('hidden'); b.el.classList.remove('live'); b.vis=false; } continue; }
+      if(!b.vis){ b.el.classList.remove('hidden'); b.vis=true; }
+      const a = 1 - smooth(0.32, 0.92, an);       // opacity
+      const sc = 0.9 + 0.1*a;                      // depth scale
+      const dx = n * 70;                           // parallax swoosh
+      const dy = (b.y||0) * (window.innerHeight/100) + n*22; // vertical drift
+      const rot = (parseFloat(b.el.style.getPropertyValue('--rot'))||0) * (1 - a*0.4);
+      b.el.style.opacity = a.toFixed(3);
+      b.el.style.transform = `translate(-50%,-50%) translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sc.toFixed(3)}) rotate(${rot.toFixed(2)}deg)`;
+      if(an<0.4) b.el.classList.add('live'); else b.el.classList.remove('live');
+    }
+  }
 
   /* ===== focus player ===== */
   const focusOpen = () => focusEl.classList.contains('on');
@@ -358,7 +365,7 @@
   focusEl.addEventListener('click', e=>{ if(e.target===focusEl) closeFocus(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeFocus(); });
 
-  /* ===== smooth LINEAR horizontal scroll ===== */
+  /* ===== smooth linear scroll (the camera) ===== */
   const maxScroll = () => track.scrollWidth - track.clientWidth;
   let target = 0, raf = null;
   function animate(){
@@ -377,31 +384,20 @@
   }, { passive:false });
   document.addEventListener('keydown', e=>{
     if(focusOpen()) return;
-    if(e.key==='ArrowRight'||e.key==='ArrowDown') glide(track.clientWidth*0.85);
-    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   glide(-track.clientWidth*0.85);
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') glide(track.clientWidth*0.8);
+    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   glide(-track.clientWidth*0.8);
   });
 
-  /* progress + subtle doodle parallax */
-  function onScroll(){
-    const ms = maxScroll();
-    prog.style.width = (ms>0 ? (track.scrollLeft/ms*100) : 0) + '%';
-    if(track.scrollLeft>40) hint.classList.add('gone');
-    const vw = track.clientWidth, idx = Math.round(track.scrollLeft/vw);
-    for(let k=idx-1;k<=idx+1;k++){ const p=panels[k]; if(!p) continue;
-      const off = p.offsetLeft - track.scrollLeft;
-      p.querySelectorAll('.doodle > svg').forEach((d,i)=>{ d.style.transform = `translateX(${off*(i%2?-0.05:0.05)}px)`; });
-    }
-  }
-  track.addEventListener('scroll', onScroll, { passive:true });
+  track.addEventListener('scroll', render, { passive:true });
 
   /* drag to scroll */
-  let down=false, sx=0, sl=0, drag=false;
-  track.addEventListener('pointerdown', e=>{ if(e.pointerType==='mouse'){ down=true; drag=false; sx=e.clientX; sl=track.scrollLeft; if(raf){cancelAnimationFrame(raf);raf=null;} } });
-  track.addEventListener('pointermove', e=>{ if(!down) return; if(Math.abs(e.clientX-sx)>4) drag=true; track.scrollLeft=sl-(e.clientX-sx); target=track.scrollLeft; });
-  window.addEventListener('pointerup', ()=>{ if(down){ down=false; setTimeout(()=>drag=false,0); } });
-  track.addEventListener('click', e=>{ if(drag){ e.stopPropagation(); e.preventDefault(); } }, true);
+  let down=false, sx=0, sl0=0, dragMoved=false;
+  track.addEventListener('pointerdown', e=>{ if(e.pointerType!=='touch'){ down=true; dragMoved=false; sx=e.clientX; sl0=track.scrollLeft; if(raf){cancelAnimationFrame(raf);raf=null;} } });
+  track.addEventListener('pointermove', e=>{ if(!down) return; if(Math.abs(e.clientX-sx)>4) dragMoved=true; track.scrollLeft=sl0-(e.clientX-sx); target=track.scrollLeft; });
+  window.addEventListener('pointerup', ()=>{ if(down){ down=false; setTimeout(()=>dragMoved=false,30); } });
 
-  onScroll();
+  window.addEventListener('resize', ()=>{ layout(); render(); });
+  layout(); render();
 </script>
 </body>
 </html>
