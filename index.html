@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,148 +7,217 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
+  :root{
+    --red:#e2231a; --blue:#1733cc; --yellow:#f5c400; --green:#0f7a4f;
+    --ink:#111010; --paper:#f3efe4; --bone:#fbf9f2;
+  }
   *{box-sizing:border-box;}
   html,body{margin:0;height:100%;width:100%;overflow:hidden;}
-  body{background:#fff;color:#16150f;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:var(--paper);color:var(--ink);
+    font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
 
   /* ===== linear horizontal scroller (no snap) ===== */
   #track{display:flex;height:100%;width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
   #track::-webkit-scrollbar{display:none;}
-  .panel{flex:0 0 100vw;height:100%;position:relative;overflow:hidden;}
+  .panel{flex:0 0 100vw;height:100%;position:relative;overflow:hidden;background:var(--paper);}
 
-  /* the single giant halftone vine — BEHIND photos/videos */
-  #vine{position:fixed;inset:0;width:100vw;height:100vh;z-index:3;pointer-events:none;}
+  /* paper grain over everything (subtle, sober) */
+  .panel::after{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;mix-blend-mode:multiply;opacity:.06;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
-  /* media always above the vine */
-  .media,.polaroid,.fullphoto,.page .photo{z-index:12;}
-  .txt,.bigtitle,.cap,.cap2,.credit,.clip,.vclip,.ztag{z-index:20;}
+  /* media above decorations */
+  .media,.polaroid,.fullphoto,.page .photo,.cutout{z-index:12;}
+  .txt,.bigtitle,.cap,.cap2,.credit,.clip,.vclip,.ztag,.doodle,.tag,.num,.q,.kicker{z-index:20;}
 
-  /* ===== brand mark (always legible via blend) ===== */
-  #brand{position:fixed;top:max(20px,env(safe-area-inset-top));left:max(22px,env(safe-area-inset-left));z-index:320;
+  /* ===== brand mark ===== */
+  #brand{position:fixed;top:max(18px,env(safe-area-inset-top));left:max(20px,env(safe-area-inset-left));z-index:320;
     pointer-events:none;mix-blend-mode:difference;color:#fff;}
-  #brand .n{font-size:clamp(16px,1.7vw,22px);font-weight:600;letter-spacing:.01em;}
-  #brand .r{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;opacity:.85;margin-top:4px;}
+  #brand .n{font-size:clamp(15px,1.6vw,21px);font-weight:700;letter-spacing:.01em;}
+  #brand .r{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.26em;text-transform:uppercase;opacity:.9;margin-top:4px;}
+
+  /* ===== progress bar (top) ===== */
+  #prog{position:fixed;top:0;left:0;height:4px;width:0;z-index:330;
+    background:var(--red);box-shadow:0 0 0 1px rgba(0,0,0,.15);transition:width .12s linear;}
 
   /* ===== shared type ===== */
-  .bigtitle{font-weight:600;font-size:clamp(30px,5.2vw,78px);line-height:.92;letter-spacing:-.015em;color:#ff1597;}
-  .cap2{font-size:clamp(13px,1.35vw,18px);line-height:1.5;margin-top:14px;text-align:justify;}
-  .ztag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.8;}
+  .bigtitle{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+    font-size:clamp(34px,6vw,92px);line-height:.86;letter-spacing:.005em;color:var(--ink);}
+  .kicker{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+    display:inline-block;padding:5px 10px;background:var(--ink);color:var(--bone);margin-bottom:14px;}
+  .cap2{font-size:clamp(13px,1.35vw,18px);line-height:1.55;margin-top:14px;max-width:46ch;}
+  .ztag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.85;}
 
-  /* ===== SECTION 1 — zine ===== */
-  .zine{display:grid;place-items:center;background:#fff;}
-  .page{position:relative;width:min(92vw, 74vh);aspect-ratio:736 / 920;container-type:inline-size;background:#fff;isolation:isolate;}
-  .page .photo{position:absolute; top:5%; right:6.5%; width:49%; height:73%;overflow:hidden;
-    background-image:
-      radial-gradient(42% 30% at 66% 18%, rgba(255,252,238,.97), rgba(255,244,214,.35) 32%, rgba(255,244,214,0) 62%),
-      repeating-linear-gradient(94deg, rgba(12,20,10,0) 0 26px, rgba(10,16,8,.20) 26px 30px),
-      linear-gradient(165deg,#1d241a 0%,#33361d 42%,#5b4f33 76%,#85714a 100%);
-    background-size:cover;background-position:center;box-shadow:0 2px 14px rgba(0,0,0,.12);}
-  .page .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-  .clip{position:absolute; top:1.6%; left:51%; width:5.4%;transform:rotate(-17deg); filter:drop-shadow(0 1px 1px rgba(0,0,0,.18));}
-  .clip svg{display:block;width:100%;height:auto;}
-  .cap{position:absolute; font-size:2.2cqw; line-height:1.42;letter-spacing:.005em; text-align:justify; color:#161413;font-weight:450;}
-  .cap--a{ left:4.5%; top:15%; width:30%; }
-  .cap--b{ left:5%; bottom:4.5%; width:34%; }
-  .credit{position:absolute; right:5%; bottom:3.2%;font-family:'Space Mono',monospace; font-size:1.6cqw; letter-spacing:.22em;text-transform:uppercase; color:#16150f; opacity:.55;}
+  /* ===== scroll-reveal ===== */
+  .reveal{opacity:0;transform:translateY(28px);
+    transition:opacity .8s ease var(--d,0s), transform .9s cubic-bezier(.2,.75,.2,1) var(--d,0s);}
+  .reveal.l{transform:translateX(-44px);}
+  .reveal.r{transform:translateX(44px);}
+  .panel.in .reveal{opacity:1;transform:none;}
 
-  /* ===== media: video frame & full media ===== */
-  .vframe{position:absolute;aspect-ratio:16/9;overflow:hidden;border-radius:5px;cursor:pointer;
-    box-shadow:0 16px 40px rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.55);background:#222;}
-  .vframe img{width:100%;height:100%;object-fit:cover;display:block;}
-  .vframe.gray img{filter:grayscale(1) contrast(1.05);}
+  /* handdrawn doodles draw-in */
+  .doodle{position:absolute;pointer-events:none;overflow:visible;}
+  .doodle>svg{display:block;width:100%;height:auto;will-change:transform;}
+  .vclip svg{display:block;width:100%;height:auto;filter:drop-shadow(0 1px 1px rgba(0,0,0,.22));}
+  .doodle path,.doodle line,.doodle circle,.doodle polyline,.doodle ellipse{
+    stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.1s ease var(--dd,.15s);}
+  .panel.in .doodle path,.panel.in .doodle line,.panel.in .doodle circle,
+  .panel.in .doodle polyline,.panel.in .doodle ellipse{stroke-dashoffset:0;}
+
+  /* ===== CUTOUT (collage) treatment for photos/frames ===== */
+  .cutout{position:relative;background:var(--bone);padding:10px;
+    box-shadow:0 18px 38px rgba(0,0,0,.22), 0 2px 0 rgba(0,0,0,.06);
+    clip-path:polygon(1% 2%,99% 0,100% 98%,2% 100%);}
+  .cutout img{display:block;width:100%;height:100%;object-fit:cover;}
+  .cutout::before{content:"";position:absolute;top:-14px;left:50%;transform:translateX(-50%) rotate(-4deg);
+    width:78px;height:26px;background:rgba(229,222,196,.72);box-shadow:0 1px 4px rgba(0,0,0,.14);
+    border-left:1px dashed rgba(0,0,0,.08);border-right:1px dashed rgba(0,0,0,.08);}
+
+  /* ===== COVER ===== */
+  .cover{display:grid;place-items:center;background:var(--paper);}
+  .cover .wrap{position:relative;width:min(90vw,1100px);text-align:center;}
+  .cover .name{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.82;
+    font-size:clamp(56px,13vw,200px);letter-spacing:.01em;}
+  .cover .name .w2{color:var(--red);}
+  .cover .sub{font-family:'Space Mono',monospace;letter-spacing:.34em;text-transform:uppercase;
+    font-size:clamp(11px,1.4vw,15px);margin-top:26px;}
+  .cover .stamp{position:absolute;top:-6%;right:2%;width:clamp(120px,16vw,210px);transform:rotate(8deg);}
+
+  /* ===== GODARD INTERTITLE CARD ===== */
+  .card{display:grid;place-items:center;text-align:center;color:var(--bone);}
+  .card .inner{position:relative;width:min(86vw,1000px);}
+  .card .num{font-family:'Anton',sans-serif;font-size:clamp(110px,24vw,320px);line-height:.78;
+    -webkit-text-stroke:2px currentColor;color:transparent;opacity:.9;}
+  .card .q{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.92;
+    font-size:clamp(28px,5vw,72px);margin-top:6px;}
+  .card .by{font-family:'Space Mono',monospace;letter-spacing:.26em;text-transform:uppercase;
+    font-size:11px;margin-top:22px;opacity:.85;}
+
+  /* ===== MARQUEE strip ===== */
+  .strip{position:absolute;left:0;width:100%;overflow:hidden;background:var(--ink);color:var(--bone);
+    padding:9px 0;font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:.04em;
+    font-size:clamp(15px,1.8vw,24px);white-space:nowrap;z-index:25;}
+  .strip .run{display:inline-block;animation:run 22s linear infinite;}
+  .strip span{margin:0 26px;}
+  .strip .dot{color:var(--red);}
+  @keyframes run{to{transform:translateX(-50%);}}
+
+  /* ===== media: video frame & play ===== */
+  .vframe{position:absolute;aspect-ratio:16/9;cursor:pointer;}
+  .vframe.gray img{filter:grayscale(1) contrast(1.06);}
   .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:clamp(54px,5vw,76px);aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(2px);
-    border:2px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;
-    color:#fff;font-size:clamp(16px,1.8vw,24px);padding-left:4px;transition:transform .3s,background .3s;pointer-events:none;}
-  .media:hover .vplay{transform:translate(-50%,-50%) scale(1.08);background:rgba(255,255,255,.3);}
-  .vclip{position:absolute;width:clamp(34px,3.2vw,52px);transform:rotate(-16deg);filter:drop-shadow(0 1px 1px rgba(0,0,0,.22));}
-  .vclip svg{display:block;width:100%;height:auto;}
+    width:clamp(54px,5vw,78px);aspect-ratio:1;border-radius:50%;background:var(--red);
+    border:3px solid var(--bone);display:flex;align-items:center;justify-content:center;
+    color:var(--bone);font-size:clamp(16px,1.8vw,24px);padding-left:4px;
+    transition:transform .3s, background .3s;z-index:14;box-shadow:0 8px 22px rgba(0,0,0,.3);}
+  .media:hover .vplay{transform:translate(-50%,-50%) scale(1.1);background:var(--blue);}
 
   /* layouts (desktop) */
-  .sec .txt{position:absolute;width:27%;}
-  .lay-right .media{position:absolute;right:7%;top:14%;width:50%;transform:rotate(1.2deg);}
-  .lay-right .txt{left:6%;top:34%;}
-  .lay-left  .media{position:absolute;left:8%;top:16%;width:52%;transform:rotate(-1.4deg);}
-  .lay-left  .txt{right:6%;top:32%;text-align:right;}
-  .lay-two .media.m1{position:absolute;left:7%;top:14%;width:43%;transform:rotate(-3deg);}
-  .lay-two .media.m2{position:absolute;right:6%;bottom:11%;width:46%;transform:rotate(2.4deg);}
-  .lay-two .txt{right:7%;top:15%;text-align:right;}
+  .sec .txt{position:absolute;width:30%;}
+  .lay-right .media{position:absolute;right:7%;top:15%;width:50%;transform:rotate(1.4deg);}
+  .lay-right .txt{left:6%;top:32%;}
+  .lay-left  .media{position:absolute;left:8%;top:17%;width:52%;transform:rotate(-1.6deg);}
+  .lay-left  .txt{right:6%;top:30%;text-align:right;}
+  .lay-two .media.m1{position:absolute;left:7%;top:13%;width:43%;transform:rotate(-3deg);}
+  .lay-two .media.m2{position:absolute;right:6%;bottom:10%;width:46%;transform:rotate(2.6deg);}
+  .lay-two .txt{right:7%;top:14%;text-align:right;}
 
-  /* full-bleed media (photo or pattern video) */
+  /* full-bleed media */
   .full .media,.fullphoto{position:absolute;inset:0;overflow:hidden;}
   .full .media img,.fullphoto img{width:100%;height:100%;object-fit:cover;display:block;}
   .full .media{cursor:pointer;}
   .full .vplay{width:clamp(70px,7vw,104px);}
-  .full .txt{left:6%;bottom:9%;width:46%;}
-  .full .txt .cap2,.fullphoto .cap2{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
-  .full .bigtitle,.fullphoto .bigtitle{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.5);}
+  .full .txt{left:6%;bottom:10%;width:50%;}
+  .full .txt .cap2,.fullphoto .cap2{color:var(--bone);text-shadow:0 1px 10px rgba(0,0,0,.6);}
+  .full .bigtitle,.fullphoto .bigtitle{color:var(--bone);text-shadow:0 2px 16px rgba(0,0,0,.5);}
+  .full .scrim,.fullphoto .scrim{position:absolute;inset:0;z-index:13;pointer-events:none;
+    background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0) 48%);}
 
-  /* pattern overlays over a video */
-  .pat{position:absolute;inset:0;pointer-events:none;}
-  .pat.stars{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110'%3E%3Cpath d='M55 12 L67 44 L101 44 L73 64 L84 98 L55 78 L26 98 L37 64 L9 44 L43 44 Z' fill='%23ff1f9e'/%3E%3C/svg%3E");
-    background-size:clamp(70px,8.5vw,116px);}
-  .pat.dots{background-image:radial-gradient(circle,#e1231a 30%,transparent 32%),radial-gradient(circle,#e1231a 30%,transparent 32%);
-    background-size:clamp(58px,7vw,86px) clamp(58px,7vw,86px),clamp(58px,7vw,86px) clamp(58px,7vw,86px);
-    background-position:0 0,calc(clamp(58px,7vw,86px)/2) calc(clamp(58px,7vw,86px)/2);}
+  /* color-block panels behind full media for Godard feel */
+  .block-red{background:var(--red);} .block-blue{background:var(--blue);}
+  .block-yellow{background:var(--yellow);} .block-ink{background:var(--ink);}
 
-  /* photo placeholder gradient */
-  .fullphoto{background:linear-gradient(155deg,#f7c9e3 0%,#c3a9ea 52%,#8fa0d8 100%);}
-  .fullphoto img{position:absolute;inset:0;}
+  /* ===== SECTION — zine page (kept, recolored) ===== */
+  .zine{display:grid;place-items:center;background:var(--paper);}
+  .page{position:relative;width:min(92vw, 74vh);aspect-ratio:736 / 920;container-type:inline-size;
+    background:var(--bone);isolation:isolate;box-shadow:0 24px 60px rgba(0,0,0,.18);
+    clip-path:polygon(0.6% 1%,99.4% 0,100% 99%,1% 100%);}
+  .page .photo{position:absolute; top:5%; right:6.5%; width:49%; height:73%;overflow:hidden;
+    box-shadow:0 2px 14px rgba(0,0,0,.16);}
+  .page .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .cap{position:absolute; font-size:2.2cqw; line-height:1.45;letter-spacing:.005em; text-align:justify; color:var(--ink);font-weight:450;}
+  .cap--a{ left:4.5%; top:15%; width:30%; }
+  .cap--b{ left:5%; bottom:5%; width:34%; }
+  .credit{position:absolute; right:5%; bottom:3.2%;font-family:'Space Mono',monospace; font-size:1.6cqw; letter-spacing:.22em;text-transform:uppercase; color:var(--ink); opacity:.6;}
 
   /* ===== polaroid ===== */
-  .polaroid-sec{background:#fff;}
-  .polaroid{position:absolute;left:40%;top:28%;width:23%;background:#fcfbf7;padding:3.4% 3.4% 9%;
-    box-shadow:0 22px 48px rgba(0,0,0,.24);transform:rotate(3deg);border-radius:3px;}
-  .polaroid .pic{width:100%;aspect-ratio:1/1.08;object-fit:cover;display:block;
-    background:linear-gradient(160deg,#f7c9e3,#c2a8e8 55%,#8fa0d8);}
-  .polaroid .hw{font-family:'Caveat',cursive;color:#ff1597;text-align:center;font-size:clamp(15px,1.7vw,24px);
-    margin-top:5%;transform:rotate(-1.5deg);}
-  .polaroid-sec .txt{position:absolute;right:6%;top:8%;width:40%;text-align:right;}
+  .polaroid-sec{background:var(--paper);}
+  .polaroid{position:absolute;left:40%;top:26%;width:24%;background:var(--bone);padding:3.4% 3.4% 9%;
+    box-shadow:0 24px 50px rgba(0,0,0,.26);transform:rotate(3deg);}
+  .polaroid .pic{width:100%;aspect-ratio:1/1.08;object-fit:cover;display:block;background:#ddd;}
+  .polaroid .hw{font-family:'Caveat',cursive;color:var(--blue);text-align:center;font-weight:600;
+    font-size:clamp(15px,1.7vw,24px);margin-top:5%;transform:rotate(-1.5deg);}
+  .polaroid-sec .txt{position:absolute;right:6%;top:9%;width:40%;text-align:right;}
   .polaroid-sec .bigtitle.btm{position:absolute;right:6%;bottom:11%;left:auto;width:auto;max-width:62%;text-align:right;}
 
+  /* ===== GALLERY wall (scalable: many cutout photos) ===== */
+  .gallery{background:var(--paper);display:grid;place-items:center;}
+  .gallery .grid{position:relative;width:min(92vw,1200px);display:grid;
+    grid-template-columns:repeat(12,1fr);gap:18px;align-content:center;}
+  .gallery .g{position:relative;}
+  .gallery .g img{display:block;width:100%;height:100%;object-fit:cover;}
+  .gallery .ttl{position:absolute;left:0;top:7%;}
+
   /* ===== scroll hint ===== */
-  #hint{position:fixed;right:26px;bottom:24px;z-index:300;font-family:'Space Mono',monospace;font-size:11px;
-    letter-spacing:.22em;text-transform:uppercase;color:#888;opacity:.7;transition:opacity .5s;pointer-events:none;mix-blend-mode:difference;}
+  #hint{position:fixed;right:24px;bottom:22px;z-index:300;font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--ink);opacity:.7;transition:opacity .5s;pointer-events:none;mix-blend-mode:difference;}
   #hint.gone{opacity:0;}
 
   /* ===== focus player ===== */
   #focus{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
-    background:rgba(20,16,14,.9);backdrop-filter:blur(6px);padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));}
+    background:rgba(14,14,14,.92);backdrop-filter:blur(6px);padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));}
   #focus.on{display:flex;}
-  #focus .frame{position:relative;width:min(1100px,100%);aspect-ratio:16/9;max-height:100%;border-radius:6px;overflow:hidden;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.6);}
+  #focus .frame{position:relative;width:min(1100px,100%);aspect-ratio:16/9;max-height:100%;overflow:hidden;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.6);}
   #focus iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
   #focus .meta{position:absolute;left:50%;bottom:-32px;transform:translateX(-50%);color:rgba(255,255,255,.72);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;}
   #focus .meta a{color:inherit;opacity:.85;margin-left:12px;}
-  #focus .close{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff;font-size:21px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  #focus .close{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border:2px solid var(--bone);background:var(--red);color:#fff;font-size:21px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
   /* ================= MOBILE ================= */
   @media (max-width:760px){
     .page{ width:92vw; } .cap{ font-size:3.2cqw; } .credit{ font-size:2.6cqw; }
     .sec .txt{width:86% !important;}
-    .lay-right .media,.lay-left .media{left:50%!important;right:auto!important;top:30%!important;width:88%!important;
+    .lay-right .media,.lay-left .media{left:50%!important;right:auto!important;top:28%!important;width:88%!important;
       transform:translate(-50%,0) rotate(0)!important;}
     .lay-right .txt,.lay-left .txt{left:7%!important;right:auto!important;top:auto!important;bottom:7%!important;text-align:left!important;}
-    .lay-two .media.m1{left:6%!important;top:9%!important;right:auto!important;width:82%!important;transform:rotate(-2deg)!important;}
+    .lay-two .media.m1{left:6%!important;top:8%!important;right:auto!important;width:82%!important;transform:rotate(-2deg)!important;}
     .lay-two .media.m2{left:12%!important;top:44%!important;right:auto!important;bottom:auto!important;width:82%!important;transform:rotate(2deg)!important;}
     .lay-two .txt{left:7%!important;right:auto!important;top:auto!important;bottom:4%!important;text-align:left!important;}
     .full .txt{width:88%!important;}
-    .polaroid{left:50%!important;top:12%!important;width:62%!important;transform:translateX(-50%) rotate(2.5deg)!important;}
+    .polaroid{left:50%!important;top:11%!important;width:64%!important;transform:translateX(-50%) rotate(2.5deg)!important;}
     .polaroid-sec .txt{left:7%!important;right:auto!important;top:auto!important;bottom:30%!important;width:86%!important;text-align:left!important;}
     .polaroid-sec .bigtitle.btm{left:7%!important;right:auto!important;bottom:9%!important;max-width:86%!important;text-align:left!important;}
+    .cover .stamp{display:none;}
+    .gallery .grid{gap:12px;}
     #focus .meta{display:none;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{transition:none;opacity:1;transform:none;}
+    .doodle path,.doodle line,.doodle circle,.doodle polyline,.doodle ellipse{transition:none;stroke-dashoffset:0;}
+    .strip .run{animation:none;}
   }
 </style>
 </head>
 <body>
 
+<div id="prog"></div>
 <div id="track"></div>
 
-<svg id="vine" aria-hidden="true"></svg>
 <div id="brand"><div class="n">chiara cucciardi</div><div class="r">attrice · roma</div></div>
-<div id="hint">scorri &darr;</div>
+<div id="hint">scorri &rarr;</div>
 
 <div id="focus">
   <div class="frame">
@@ -160,10 +229,10 @@
 
 <script>
 /* =====================================================================
-   CHIARA CUCCIARDI — zine scroll lineare orizzontale.
-   Sezioni miste: zine, video incorniciati, foto full-page, polaroid,
-   video con pattern (stelle / pois). Foto&video SOPRA il ramo halftone.
-   Le immagini placeholder: mettile in  assets/  (vedi i percorsi sotto).
+   CHIARA CUCCIARDI — portfolio zine, scroll lineare orizzontale.
+   Stile Godard / Nouvelle Vague: title-card, colori primari, collage
+   cutout ed elementi disegnati a mano (handdrawn) che si "tracciano"
+   in scena. Pensato per crescere: aggiungi voci in SECTIONS.
    ===================================================================== */
 
   const VIDEOS = [
@@ -174,29 +243,55 @@
     { id:'SLc8H1eY58Y', title:'Backstage', cat:'backstage' },
   ];
 
-  /* l'ordine e i contenuti delle sezioni — riordina/aggiungi liberamente */
+  /* ====== HANDDRAWN DOODLE LIBRARY (svg, draw-in) ====== */
+  const DO = {
+    circle:(c='var(--red)')=>`<svg class="doodle" viewBox="0 0 200 120" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"><path pathLength="1" d="M100 8C45 6 14 34 12 62c-3 33 44 52 92 50 41-2 86-22 84-54C186 27 142 9 96 11"/></svg>`,
+    underline:(c='var(--blue)')=>`<svg class="doodle" viewBox="0 0 320 40" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><path pathLength="1" d="M6 22C70 10 150 30 230 16c36-6 70-8 86-2"/></svg>`,
+    arrow:(c='var(--ink)')=>`<svg class="doodle" viewBox="0 0 160 120" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M10 14C44 70 86 96 142 100"/><path pathLength="1" d="M112 96l32 6-12-30"/></svg>`,
+    star:(c='var(--yellow)')=>`<svg class="doodle" viewBox="0 0 120 120" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M60 8l16 34 38 4-28 26 8 38-34-20-34 20 8-38-28-26 38-4z"/></svg>`,
+    squiggle:(c='var(--red)')=>`<svg class="doodle" viewBox="0 0 260 60" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"><path pathLength="1" d="M6 30c18-26 36 26 54 0s36 26 54 0 36 26 54 0 30 18 40 8"/></svg>`,
+    spark:(c='var(--ink)')=>`<svg class="doodle" viewBox="0 0 120 120" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"><path pathLength="1" d="M60 14v34M60 72v34M14 60h34M72 60h34M28 28l24 24M68 68l24 24M92 28L68 52M52 68 28 92"/></svg>`,
+  };
+  const dood = (kind,color,css)=>`<div class="doodle reveal" style="${css||''}">${DO[kind](color)}</div>`;
+
+  /* ====== SECTIONS — l'ordine e i contenuti (riordina/aggiungi) ====== */
   const SECTIONS = [
+    { type:'cover', name1:'CHIARA', name2:'CUCCIARDI', sub:'attrice · roma · mmxxvi' },
+
+    { type:'card', tone:'red',  num:'I', q:'«parlo la lingua del muschio»', by:'symphonia ix' },
+
     { type:'zine' },
-    { type:'video', lay:'lay-right', bg:'#fff', tc:'#16150f', v:0, clip:true,
-      title:'symphonia ix', cap:'"i know the language of moss: it murmurs that even stones will one day be freed from gravity’s chains, and then i’ll swim with the duck flock to forgotten shores."' },
-    { type:'photo', bg:'#fff', src:'assets/tenda.webp', title:'and it came', cap:'"with the rain — the surface remains unbroken."' },
-    { type:'video', lay:'stars', bg:'#0c0c0c', tc:'#fff', v:1,
-      title:'scena', cap:'"you’re my holy wound."' },
-    { type:'polaroid', bg:'#fff', tc:'#16150f', src:'assets/sgab.webp', clip:true,
-      hw:'by the bay — just as two', title:'we begged the sky for a miracle',
-      cap:'"the bay shore. rain drums the water with heavy drops — yet the surface remains unbroken."' },
-    { type:'video', lay:'lay-two', bg:'#0c0c0c', tc:'#fff', v:2, v2:3, clip:true,
-      title:'monologo · spot', cap:'"bleeding ‘yes’ for your maybe. burn me, blessed poison."' },
-    { type:'video', lay:'dots', bg:'#f2f0ea', tc:'#0c0c0c', v:4,
-      title:'backstage', cap:'"and it came with the rain."' },
-    { type:'photo', bg:'#fff', src:'assets/scale.webp', title:'forgotten shores', cap:'"i am a stone with a dream of a heartbeat."' },
+
+    { type:'video', lay:'lay-right', v:0, clip:true,
+      title:'symphonia ix', cap:'«conosco la lingua del muschio: mormora che persino le pietre un giorno saranno libere dalle catene della gravità.»' },
+
+    { type:'photo', src:'assets/tenda.webp', title:'and it came', cap:'«con la pioggia — la superficie resta intatta.»' },
+
+    { type:'card', tone:'blue', num:'II', q:'«sei la mia ferita santa»', by:'scena · cinema' },
+
+    { type:'video', lay:'stars', v:1, title:'scena', cap:'«you’re my holy wound.»' },
+
+    { type:'polaroid', src:'assets/sgab.webp', clip:true,
+      hw:'by the bay — just as two', title:'we begged the sky',
+      cap:'«la riva della baia. la pioggia tamburella l’acqua con gocce pesanti — eppure la superficie resta intatta.»' },
+
+    { type:'video', lay:'lay-two', v:2, v2:3, clip:true,
+      title:'monologo · spot', cap:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»' },
+
+    { type:'card', tone:'yellow', num:'III', q:'«and it came with the rain»', by:'backstage' },
+
+    { type:'video', lay:'dots', v:4, title:'backstage', cap:'«and it came with the rain.»' },
+
+    { type:'photo', src:'assets/scale.webp', title:'forgotten shores', cap:'«sono una pietra con il sogno di un battito.»' },
+
+    { type:'end', name:'fin', mail:'cleanvillagesrl@gmail.com' },
   ];
 
-  const CLIP = `<svg viewBox="0 0 40 116"><path d="M14 9 a8 8 0 0 1 16 0 v80 a13 13 0 0 1 -26 0 V23 a8 8 0 0 1 16 0 v66" fill="none" stroke="#ff1597" stroke-width="3.4" stroke-linecap="round"/></svg>`;
+  const CLIP = `<svg viewBox="0 0 40 116"><path d="M14 9 a8 8 0 0 1 16 0 v80 a13 13 0 0 1 -26 0 V23 a8 8 0 0 1 16 0 v66" fill="none" stroke="var(--blue)" stroke-width="3.4" stroke-linecap="round"/></svg>`;
 
   const track = document.getElementById('track');
   const hint  = document.getElementById('hint');
-  const vine  = document.getElementById('vine');
+  const prog  = document.getElementById('prog');
   const focusEl=document.getElementById('focus'), focusFrame=document.getElementById('focusFrame'),
         focusMeta=document.getElementById('focusMeta'), focusClose=document.getElementById('focusClose');
 
@@ -205,56 +300,105 @@
   const thumb = id => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
   const thumbF = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
   const vimg = id => `<img src="${thumb(id)}" onerror="this.onerror=null;this.src='${thumbF(id)}'" alt="">`;
+  const TONE = { red:'var(--red)', blue:'var(--blue)', yellow:'var(--yellow)', ink:'var(--ink)' };
 
   function vframe(vi, extra, gray){ const v=VIDEOS[vi];
-    return `<div class="media vframe ${extra||''} ${gray?'gray':''}" data-vi="${vi}">${vimg(v.id)}<div class="vplay">&#9654;</div></div>`; }
+    return `<div class="media cutout vframe reveal ${extra||''} ${gray?'gray':''}" data-vi="${vi}">${vimg(v.id)}<div class="vplay">&#9654;</div></div>`; }
+
+  function marquee(items, color){
+    const run = items.map(t=>`<span>${t}<span class="dot"> ✶ </span></span>`).join('');
+    return `<div class="strip reveal" style="bottom:0;${color?'background:'+color:''}"><span class="run">${run}${run}</span></div>`;
+  }
 
   /* build sections */
-  SECTIONS.forEach(s => {
+  SECTIONS.forEach((s,idx) => {
     const sec = document.createElement('section');
     sec.className = 'panel sec ' + (s.lay||'');
-    if (s.bg) sec.style.background = s.bg;
     let html = '';
 
-    if (s.type === 'zine'){
-      sec.classList.add('zine');
-      html = `<div class="page">
-          <div class="photo"><img src="assets/chiarabg.webp" alt="" onerror="this.style.display='none'"></div>
-          <div class="clip">${CLIP}</div>
-          <p class="cap cap--a">"the forest pond whispers with ducks. i am the stone guardian of ages. i dream until petrified, only to become soil — and finally sprout."</p>
-          <p class="cap cap--b">"ducks circle. water caresses the shore. i am a stone with a dream of a heartbeat."</p>
-          <div class="credit">chiara cucciardi</div>
+    if (s.type === 'cover'){
+      sec.classList.add('cover');
+      html = `<div class="wrap">
+          <div class="cutout stamp reveal r" style="transform:rotate(8deg)"><img src="assets/IMG_3657.jpg" alt=""></div>
+          <div class="kicker reveal">portfolio · cinema / teatro</div>
+          <h1 class="name reveal" style="--d:.05s"><span class="w1">${s.name1}</span><br><span class="w2">${s.name2}</span></h1>
+          ${dood('underline','var(--blue)','left:50%;bottom:16%;width:min(46vw,520px);transform:translateX(-50%);--d:.45s')}
+          ${dood('star','var(--red)','left:4%;top:2%;width:74px;--d:.3s')}
+          ${dood('spark','var(--ink)','right:6%;bottom:10%;width:60px;--d:.4s')}
+          <div class="sub reveal" style="--d:.25s">${s.sub}</div>
         </div>`;
     }
+    else if (s.type === 'card'){
+      sec.classList.add('card', 'block-'+(s.tone||'red'));
+      if (s.tone==='yellow') sec.style.color='var(--ink)';
+      html = `<div class="inner">
+          <div class="num reveal">${s.num}</div>
+          ${dood(idx%2?'squiggle':'underline', s.tone==='yellow'?'var(--ink)':'var(--bone)','left:50%;top:8%;width:min(40vw,360px);transform:translateX(-50%);--d:.3s')}
+          <div class="q reveal" style="--d:.12s">${s.q}</div>
+          <div class="by reveal" style="--d:.24s">— ${s.by}</div>
+        </div>`;
+    }
+    else if (s.type === 'zine'){
+      sec.classList.add('zine');
+      html = `<div class="page reveal">
+          <div class="photo cutout" style="padding:0;clip-path:none"><img src="assets/chiarabg.webp" alt="" onerror="this.style.display='none'"></div>
+          ${dood('circle','var(--red)','right:5%;top:2%;width:160px;--d:.4s')}
+          <p class="cap cap--a">«lo stagno del bosco sussurra con le anatre. sono la pietra che custodisce i secoli. sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»</p>
+          <p class="cap cap--b">«le anatre girano. l’acqua accarezza la riva. sono una pietra con il sogno di un battito.»</p>
+          <div class="credit">chiara cucciardi</div>
+        </div>
+        ${dood('arrow','var(--blue)','left:6%;bottom:10%;width:120px;--d:.5s')}`;
+    }
     else if (s.type === 'video' && (s.lay==='lay-right'||s.lay==='lay-left')){
-      html = vframe(s.v) + (s.clip?`<div class="vclip" style="${s.lay==='lay-right'?'right:14%':'left:14%'};top:9%">${CLIP}</div>`:'')
-        + `<div class="txt"><div class="bigtitle">${s.title}</div><p class="cap2" style="color:${s.tc}">${s.cap}</p></div>`;
+      const side = s.lay==='lay-right';
+      html = vframe(s.v, side?'r':'l')
+        + (s.clip?`<div class="vclip reveal" style="position:absolute;${side?'right:14%':'left:14%'};top:11%;width:clamp(34px,3.2vw,52px);transform:rotate(-14deg);z-index:20">${CLIP}</div>`:'')
+        + `<div class="txt"><div class="kicker reveal">${VIDEOS[s.v].cat}</div><div class="bigtitle reveal" style="--d:.08s">${s.title}</div>
+            ${dood('underline','var(--red)','left:0;margin-top:6px;position:relative;width:min(34vw,340px);--d:.3s')}
+            <p class="cap2 reveal" style="--d:.16s">${s.cap}</p></div>`;
     }
     else if (s.type === 'video' && s.lay==='lay-two'){
-      html = vframe(s.v,'m1',true) + vframe(s.v2,'m2',true)
-        + (s.clip?`<div class="vclip" style="left:8%;top:7%">${CLIP}</div>`:'')
-        + `<div class="txt"><div class="bigtitle">${s.title}</div><p class="cap2" style="color:${s.tc}">${s.cap}</p></div>`;
+      html = vframe(s.v,'m1 l',true) + vframe(s.v2,'m2 r',true)
+        + (s.clip?`<div class="vclip reveal" style="position:absolute;left:8%;top:8%;width:clamp(34px,3.2vw,52px);transform:rotate(-14deg);z-index:20">${CLIP}</div>`:'')
+        + dood('star','var(--yellow)','right:46%;top:42%;width:64px;--d:.4s')
+        + `<div class="txt"><div class="kicker reveal">teatro · spot</div><div class="bigtitle reveal" style="--d:.08s">${s.title}</div>
+            <p class="cap2 reveal" style="--d:.16s">${s.cap}</p></div>`;
     }
     else if (s.type === 'video' && (s.lay==='stars'||s.lay==='dots')){
-      sec.classList.add('full');
+      sec.classList.add('full', s.lay==='stars'?'block-ink':'block-yellow');
       const v=VIDEOS[s.v];
-      html = `<div class="media" data-vi="${s.v}">${vimg(v.id)}<div class="pat ${s.lay}"></div><div class="vplay">&#9654;</div></div>`
-        + `<div class="txt"><div class="bigtitle">${s.title}</div><p class="cap2">${s.cap}</p></div>`;
+      html = `<div class="media" data-vi="${s.v}">${vimg(v.id)}<div class="scrim"></div><div class="vplay">&#9654;</div></div>`
+        + dood(s.lay==='stars'?'star':'spark', s.lay==='stars'?'var(--yellow)':'var(--ink)','right:7%;top:12%;width:80px;--d:.4s')
+        + `<div class="txt"><div class="kicker reveal" style="background:var(--red)">${v.cat}</div><div class="bigtitle reveal" style="--d:.08s">${s.title}</div><p class="cap2 reveal" style="--d:.16s">${s.cap}</p></div>`
+        + marquee(['cinema','teatro','spot','reel','backstage'], 'var(--red)');
     }
     else if (s.type === 'photo'){
       sec.classList.add('full');
-      html = `<div class="fullphoto"><img src="${s.src}" alt="" onerror="this.style.display='none'"></div>`
-        + `<div class="txt"><div class="bigtitle">${s.title}</div><p class="cap2">${s.cap}</p></div>`;
+      html = `<div class="fullphoto"><img src="${s.src}" alt="" onerror="this.style.display='none'"><div class="scrim"></div></div>`
+        + dood('squiggle','var(--yellow)','right:7%;top:14%;width:200px;--d:.4s')
+        + `<div class="txt"><div class="kicker reveal">fotografia</div><div class="bigtitle reveal" style="--d:.08s">${s.title}</div><p class="cap2 reveal" style="--d:.16s">${s.cap}</p></div>`;
     }
     else if (s.type === 'polaroid'){
       sec.classList.add('polaroid-sec');
-      html = `<div class="polaroid" style="z-index:12">
-          <div class="pic"><img class="pic" src="${s.src}" alt="" style="margin:0" onerror="this.style.display='none'"></div>
+      html = `<div class="polaroid reveal" style="z-index:12">
+          <img class="pic" src="${s.src}" alt="" onerror="this.style.display='none'">
           <div class="hw">${s.hw}</div>
-          ${s.clip?`<div class="vclip" style="left:30%;top:-6%">${CLIP}</div>`:''}
+          ${s.clip?`<div class="vclip" style="position:absolute;left:30%;top:-6%;width:42px;z-index:20">${CLIP}</div>`:''}
         </div>
-        <div class="txt"><p class="cap2" style="color:${s.tc}">${s.cap}</p></div>
-        <div class="bigtitle btm">${s.title}</div>`;
+        ${dood('circle','var(--red)','left:33%;top:18%;width:200px;--d:.45s')}
+        ${dood('arrow','var(--blue)','left:30%;bottom:20%;width:120px;transform:scaleX(-1);--d:.55s')}
+        <div class="txt"><div class="kicker reveal">scena · diario</div><p class="cap2 reveal" style="--d:.12s">${s.cap}</p></div>
+        <div class="bigtitle btm reveal" style="--d:.2s">${s.title}</div>`;
+    }
+    else if (s.type === 'end'){
+      sec.classList.add('cover','block-blue');
+      sec.style.color='var(--bone)';
+      html = `<div class="wrap">
+          <h1 class="name reveal" style="color:var(--bone)">${s.name}</h1>
+          ${dood('underline','var(--yellow)','left:50%;bottom:24%;width:min(40vw,420px);transform:translateX(-50%);--d:.35s')}
+          ${dood('star','var(--yellow)','left:10%;top:6%;width:70px;--d:.3s')}
+          <div class="sub reveal" style="--d:.2s"><a href="mailto:${s.mail}" style="color:var(--bone)">${s.mail}</a></div>
+        </div>`;
     }
 
     sec.innerHTML = html;
@@ -262,7 +406,17 @@
     track.appendChild(sec);
   });
 
-  /* focus player */
+  const panels = [...track.children];
+
+  /* ===== scroll-reveal via IntersectionObserver (root = track, horizontal) ===== */
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  }, { root:track, threshold:0.22 });
+  panels.forEach(p=>io.observe(p));
+  // first panel visible immediately
+  requestAnimationFrame(()=>panels[0]&&panels[0].classList.add('in'));
+
+  /* ===== focus player ===== */
   const focusOpen = () => focusEl.classList.contains('on');
   function openFocus(v){
     if (isFile){ window.open('https://youtu.be/'+v.id,'_blank','noopener'); return; }
@@ -298,8 +452,22 @@
     if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   glide(-track.clientWidth*0.85);
   });
 
-  function syncVine(){ const g=document.getElementById('vineG'); if(g) g.style.transform='translateX('+(-track.scrollLeft)+'px)'; }
-  track.addEventListener('scroll', () => { syncVine(); if(track.scrollLeft>40) hint.classList.add('gone'); }, { passive:true });
+  /* ===== progress bar + subtle parallax on doodles ===== */
+  function onScroll(){
+    const ms = maxScroll();
+    prog.style.width = (ms>0 ? (track.scrollLeft/ms*100) : 0) + '%';
+    if(track.scrollLeft>40) hint.classList.add('gone');
+    // parallax: only the panel currently around the viewport
+    const vw = track.clientWidth, idx = Math.round(track.scrollLeft/vw);
+    for(let k=idx-1;k<=idx+1;k++){ const p=panels[k]; if(!p) continue;
+      const off = (p.offsetLeft - track.scrollLeft); // px relative to viewport-left
+      p.querySelectorAll('.doodle > svg').forEach((d,i)=>{
+        const f = (i%2? -1:1) * 0.04 * ((i%3)+1);
+        d.style.transform = `translateX(${off*f}px)`;
+      });
+    }
+  }
+  track.addEventListener('scroll', onScroll, { passive:true });
 
   /* drag to scroll (free/linear) */
   let down=false, sx=0, sl=0, drag=false;
@@ -308,53 +476,7 @@
   window.addEventListener('pointerup', ()=>{ if(down){ down=false; setTimeout(()=>drag=false,0); } });
   track.addEventListener('click', e=>{ if(drag){ e.stopPropagation(); e.preventDefault(); } }, true);
 
-  /* ===== one giant pink halftone vine (behind media) ===== */
-  function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-  function buildVine(){
-    const Wv=window.innerWidth, Hv=window.innerHeight, total=Wv*Math.max(1,track.children.length);
-    const INK='#ff1597', D=Math.PI/180, r=mulberry32(20260619), rnd=(a,b)=>a+r()*(b-a), out=[];
-    const leaf=(x,y,ang,len)=>{ const w=len*0.30,a=ang*D,tx=x+Math.cos(a)*len,ty=y+Math.sin(a)*len,px=Math.cos(a+Math.PI/2),py=Math.sin(a+Math.PI/2);
-      const m1x=x+Math.cos(a)*len*.5+px*w,m1y=y+Math.sin(a)*len*.5+py*w,m2x=x+Math.cos(a)*len*.5-px*w,m2y=y+Math.sin(a)*len*.5-py*w;
-      out.push(`<path d="M${x.toFixed(1)} ${y.toFixed(1)} Q${m1x.toFixed(1)} ${m1y.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)} Q${m2x.toFixed(1)} ${m2y.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)} Z" stroke="none"/>`); };
-    const berry=(x,y,n,sp)=>{ for(let i=0;i<n;i++){ const a=rnd(0,6.283),d=rnd(0,sp); out.push(`<circle cx="${(x+Math.cos(a)*d).toFixed(1)}" cy="${(y+Math.sin(a)*d).toFixed(1)}" r="${rnd(2.4,5).toFixed(1)}" stroke="none"/>`);} };
-    const flower=(x,y,rad)=>{ const p=Math.floor(rnd(6,9)); for(let k=0;k<p;k++){ const a=k/p*6.283; out.push(`<circle cx="${(x+Math.cos(a)*rad).toFixed(1)}" cy="${(y+Math.sin(a)*rad).toFixed(1)}" r="${rnd(2.6,4.6).toFixed(1)}" stroke="none"/>`);} out.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rnd(2,3.4).toFixed(1)}" stroke="none"/>`); };
-    function sprig(x,y,ang,len,wid,depth){
-      const rad=ang*D,perp=rad+Math.PI/2,cv=rnd(-.5,.5),ex=x+Math.cos(rad)*len,ey=y+Math.sin(rad)*len;
-      const mx=x+Math.cos(rad)*len*.5+Math.cos(perp)*len*.22*cv,my=y+Math.sin(rad)*len*.5+Math.sin(perp)*len*.22*cv;
-      out.push(`<path d="M${x.toFixed(1)} ${y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke-width="${wid.toFixed(1)}"/>`);
-      const nodes=Math.max(3,Math.floor(len/30));
-      for(let i=1;i<=nodes;i++){ const t=i/(nodes+1),it=1-t,px=it*it*x+2*it*t*mx+t*t*ex,py=it*it*y+2*it*t*my+t*t*ey,side=(i%2)?1:-1,ll=len*0.15*(1-t*.4);
-        if(r()<0.7) leaf(px,py,ang+side*52+rnd(-12,12),ll);
-        if(r()<0.22) flower(px,py,rnd(7,13)); else if(r()<0.3) berry(px,py,Math.floor(rnd(3,6)),ll*.8);
-        if(depth>0 && r()<0.45 && t>0.2 && t<0.85) sprig(px,py,ang+side*rnd(22,46),len*rnd(.4,.6),wid*.72,depth-1); }
-      if(r()<0.8)(r()<.5?flower(ex,ey,rnd(8,14)):berry(ex,ey,Math.floor(rnd(4,9)),9));
-    }
-    function seg(x,y,ang,len,wid){
-      const rad=ang*D,perp=rad+Math.PI/2,cv=rnd(-.4,.4),ex=x+Math.cos(rad)*len,ey=y+Math.sin(rad)*len;
-      const mx=x+Math.cos(rad)*len*.5+Math.cos(perp)*len*.22*cv,my=y+Math.sin(rad)*len*.5+Math.sin(perp)*len*.22*cv;
-      out.push(`<path d="M${x.toFixed(1)} ${y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke-width="${wid.toFixed(1)}"/>`);
-      const nodes=Math.max(3,Math.floor(len/34));
-      for(let i=1;i<=nodes;i++){ const t=i/(nodes+1),it=1-t,px=it*it*x+2*it*t*mx+t*t*ex,py=it*it*y+2*it*t*my+t*t*ey,side=(i%2)?1:-1,ll=len*0.12*(1-t*.3);
-        if(r()<0.55) leaf(px,py,ang+side*(50+rnd(-12,12)),ll);
-        if(r()<0.30 && i%2) sprig(px,py,ang+side*rnd(40,75),len*rnd(.3,.55),wid*.7,1);
-        if(r()<0.18) flower(px,py,rnd(7,12)); }
-      return {x:ex,y:ey};
-    }
-    function travel(x,y,baseAng,wid){ let cx=x,cy=y,guard=0;
-      while(cx<total+Wv*0.25 && guard++<500){ const len=rnd(Wv*0.15,Wv*0.27),a=baseAng+Math.sin(cx/Wv*1.6)*15+rnd(-7,7),e=seg(cx,cy,a,len,wid);
-        if(r()<0.5) sprig(cx,cy,a+(r()<.5?1:-1)*rnd(40,74),len*rnd(.5,.95),wid*.72,2);
-        if(r()<0.4) flower(cx,cy,rnd(9,16));
-        cx=e.x; cy=Math.max(Hv*0.12,Math.min(Hv*0.9,e.y)); wid=Math.max(2.6,wid*0.99); } }
-    sprig(Wv*0.16, Hv*0.93, -88, Hv*0.46, 6, 2);
-    travel(Wv*0.08, Hv*0.50, 2, 6.5); travel(Wv*0.06, Hv*0.38, -4, 5.4); travel(Wv*0.14, Hv*0.66, 6, 5);
-    for(let k=1;k<track.children.length;k++){ if(r()<0.85){ const fx=Wv*(k+rnd(-0.2,0.2)),fy=Hv*rnd(0.28,0.62),fans=Math.floor(rnd(3,6));
-      for(let j=0;j<fans;j++) sprig(fx,fy,-90+rnd(-65,65),rnd(Hv*0.18,Hv*0.4),4.6,2); flower(fx,fy,rnd(12,20)); } }
-    vine.setAttribute('viewBox',`0 0 ${Wv} ${Hv}`);
-    vine.innerHTML=`<defs><pattern id="htv" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.9" fill="${INK}"/></pattern></defs><g id="vineG" fill="url(#htv)" stroke="url(#htv)" stroke-linecap="round" style="transform:translateX(${-track.scrollLeft}px)">${out.join('')}</g>`;
-  }
-
-  window.addEventListener('resize', () => { buildVine(); syncVine(); });
-  buildVine(); syncVine();
+  onScroll();
 </script>
 </body>
 </html>
