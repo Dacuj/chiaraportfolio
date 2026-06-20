@@ -53,10 +53,11 @@
   .land .shot img{max-height:60vh;max-width:90vw;}
 
   /* ===== QUAD (Quadrophenia tri/quad colour) ===== */
-  .quad{display:flex;align-items:flex-end;cursor:zoom-in;}
-  .quad .c{margin-left:-9%;}
+  .quad{position:relative;display:flex;align-items:flex-end;justify-content:center;cursor:zoom-in;max-width:96vw;}
+  .quad .c{flex:0 0 auto;margin-left:-80%;}
   .quad .c:first-child{margin-left:0;}
-  .quad img{display:block;height:70vh;max-height:70vh;width:auto;}
+  .quad .c1{z-index:1}.quad .c2{z-index:2}.quad .c3{z-index:3}.quad .c4{z-index:4}
+  .quad img{display:block;height:min(64vh,78vw);width:auto;box-shadow:-14px 0 26px rgba(0,0,0,.28);}
   .quad .c1 img{filter:grayscale(1) sepia(1) saturate(7) hue-rotate(5deg) contrast(1.05);}    /* giallo */
   .quad .c2 img{filter:grayscale(1) sepia(1) saturate(9) hue-rotate(-18deg) contrast(1.05);}  /* arancio */
   .quad .c3 img{filter:grayscale(1) sepia(1) saturate(12) hue-rotate(-40deg) contrast(1.1);}  /* rosso */
@@ -212,7 +213,8 @@
 
   @media (max-width:760px){
     .shot img{max-height:60vh;max-width:88vw;}
-    .quad img{height:42vh;max-height:42vh;}
+    .quad img{height:min(48vh,84vw);}
+    .quad .c{margin-left:-82%;}
     .word b{font-size:clamp(46px,15vw,92px);}
     .hero{padding-top:0;}
     .hero .pic img{max-height:52vh;max-width:88vw;}
@@ -484,6 +486,10 @@
     pages.scrollTop=cur+d*0.135; sRaf=requestAnimationFrame(sStep); }
   function smoothTo(v){ sTarget=Math.max(0,Math.min(pages.scrollHeight-pages.clientHeight, v));
     if(!sRaf) sRaf=requestAnimationFrame(sStep); }
+  function cancelSmooth(){ if(sRaf){ cancelAnimationFrame(sRaf); sRaf=null; } sTarget=null; }
+  /* se l'utente tocca/trascina, l'animazione si ferma subito (niente blocco dopo il menu) */
+  pages.addEventListener('touchstart', cancelSmooth, {passive:true});
+  pages.addEventListener('pointerdown', e=>{ if(e.pointerType==='touch') cancelSmooth(); }, {passive:true});
   pages.addEventListener('wheel',e=>{ if(modalOpen()) return; e.preventDefault();
     const base=(sTarget==null?pages.scrollTop:sTarget);
     smoothTo(base + (Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX)*1.15); }, {passive:false});
