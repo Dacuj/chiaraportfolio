@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chiara Cucciardi</title>
+<script>document.documentElement.className+=' js';</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,130 +16,138 @@
     --ink:#0e0e0e; --paper:#f3efe4; --bone:#fbf9f2;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;height:100%;width:100%;overflow:hidden;background:#080808;}
-  body{color:#fff;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;
-    touch-action:none;cursor:grab;}
-  body.dragging{cursor:grabbing;}
+  html,body{margin:0;}
+  html{scroll-behavior:smooth;}
+  body{background:#0e0e0e;color:#fff;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
-  /* scene color wash behind the 3D world */
-  #bg{position:fixed;inset:0;z-index:0;background:#0e0e0e;transition:background-color .12s linear;}
+  /* colour wash behind everything */
+  #bg{position:fixed;inset:0;z-index:0;background:#0e0e0e;transition:background-color .7s ease;}
 
-  /* ===== 3D theatre space ===== */
-  #scene{position:fixed;inset:0;z-index:1;overflow:hidden;perspective:1500px;perspective-origin:50% 48%;}
-  #world{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;will-change:transform;}
+  /* ===== reveal (only when JS is on) ===== */
+  .js .reveal{opacity:0;transform:translateY(42px);}
+  .reveal{transition:opacity 1s ease var(--d,0s), transform 1.05s cubic-bezier(.2,.7,.2,1) var(--d,0s);}
+  .js .reveal.l{transform:translateX(-70px);}
+  .js .reveal.r{transform:translateX(70px);}
+  .scene.in .reveal{opacity:1 !important;transform:none !important;}
 
-  .beat{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform,opacity;}
-  .beat .inner{position:relative;transform:translate(-50%,-50%);}
+  /* draw-in for handdrawn doodles */
+  .doodle{position:absolute;pointer-events:none;overflow:visible;z-index:6;}
+  .doodle>svg{display:block;width:100%;height:auto;}
+  .js .doodle path,.js .doodle line,.js .doodle polyline{stroke-dasharray:1;stroke-dashoffset:1;}
+  .doodle path,.doodle line,.doodle polyline{transition:stroke-dashoffset 1.4s ease .25s;}
+  .scene.in .doodle path,.scene.in .doodle line,.scene.in .doodle polyline{stroke-dashoffset:0;}
 
-  /* photo — shown whole, never cropped, no text on it */
-  .ph{position:relative;line-height:0;}
-  .ph img{display:block;width:auto;height:auto;max-height:80vh;max-width:52vw;
+  /* ===== scenes ===== */
+  main{position:relative;z-index:1;}
+  .scene{position:relative;min-height:100vh;display:grid;place-items:center;padding:12vh 6vw;overflow:hidden;}
+  .scene.short{min-height:82vh;}
+
+  /* photo — always whole, never cropped */
+  .stagewrap{position:relative;}
+  .shot{position:relative;will-change:transform;}
+  .shot img{display:block;width:auto;height:auto;max-height:78vh;max-width:84vw;
     box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.15);}
-  .hero  .ph img{max-height:90vh;max-width:58vw;}
-  .land  .ph img{max-height:66vh;max-width:82vw;}
-  .small .ph img{max-height:58vh;max-width:42vw;}
+  .scene.hero .shot img{max-height:90vh;}
+  .scene.land .shot img{max-height:64vh;max-width:90vw;}
+  .scene.small .shot img{max-height:58vh;max-width:60vw;}
 
-  /* pois plane behind a photo (sits a touch deeper in 3D) */
-  .poisplane{position:absolute;left:50%;top:50%;width:135%;height:118%;transform:translate(-50%,-50%) translateZ(-40px);
+  /* pois plane behind a photo */
+  .pois{position:absolute;left:50%;top:50%;width:138%;height:122%;transform:translate(-50%,-50%);
     z-index:-1;background-image:radial-gradient(currentColor 22%,transparent 24%);
-    background-size:clamp(22px,2.6vw,34px) clamp(22px,2.6vw,34px);opacity:.6;}
+    background-size:clamp(22px,2.6vw,34px) clamp(22px,2.6vw,34px);opacity:.55;}
 
-  /* video — reliable cover, always clickable */
-  .vframe{position:relative;width:56vw;max-width:780px;aspect-ratio:16/9;cursor:pointer;overflow:hidden;
+  /* scattered labels & ghost words */
+  .tag{position:absolute;z-index:6;font-family:'Space Mono',monospace;font-size:clamp(10px,1.1vw,13px);
+    letter-spacing:.26em;text-transform:uppercase;color:#fff;mix-blend-mode:difference;white-space:nowrap;}
+  .ghost{position:absolute;z-index:1;font-family:'Anton',sans-serif;text-transform:uppercase;
+    font-size:clamp(80px,18vw,260px);line-height:.8;letter-spacing:.01em;color:#fff;opacity:.06;white-space:nowrap;pointer-events:none;}
+
+  /* video */
+  .vframe{position:relative;width:min(78vw,860px);aspect-ratio:16/9;cursor:pointer;overflow:hidden;
     background:#111;box-shadow:0 40px 90px rgba(0,0,0,.55);}
   .vframe img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.12) contrast(1.03);}
   .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
     width:clamp(64px,6.5vw,94px);aspect-ratio:1;border-radius:50%;background:var(--red);
     border:3px solid var(--bone);display:flex;align-items:center;justify-content:center;
     color:var(--bone);font-size:clamp(20px,2vw,28px);padding-left:5px;z-index:2;
-    transition:transform .3s, background .3s;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+    transition:transform .3s,background .3s;box-shadow:0 10px 28px rgba(0,0,0,.4);}
   .vframe:hover .vplay{transform:translate(-50%,-50%) scale(1.1);background:var(--blue);}
   .vtag{position:absolute;top:14px;left:14px;z-index:3;font-family:'Space Mono',monospace;font-size:11px;
     letter-spacing:.22em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.45);padding:5px 9px;}
 
-  /* word / intertitle */
+  /* intertitle word */
   .word{text-align:center;}
-  .word b{display:block;font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.82;
-    font-size:clamp(58px,11vw,176px);letter-spacing:.02em;white-space:nowrap;}
-  .word .lab{font-family:'Space Mono',monospace;font-size:clamp(10px,1.2vw,13px);letter-spacing:.32em;
-    text-transform:uppercase;opacity:.75;margin-bottom:18px;color:inherit;}
+  .word .lab{font-family:'Space Mono',monospace;font-size:clamp(10px,1.2vw,13px);letter-spacing:.34em;
+    text-transform:uppercase;opacity:.75;margin-bottom:20px;color:inherit;}
   .word .lab a{color:inherit;}
+  .word b{display:block;font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.82;
+    font-size:clamp(58px,12vw,184px);letter-spacing:.02em;}
+  .scene.in .word b{animation:spread 1.2s cubic-bezier(.2,.7,.2,1) both;}
+  @keyframes spread{from{letter-spacing:-.04em;opacity:.2;}to{letter-spacing:.02em;opacity:1;}}
 
-  /* handdrawn logo */
-  .logo{text-align:center;}
-  .logo img{height:clamp(80px,15vh,160px);width:auto;filter:invert(1);}
-  .logo .lab{margin-top:22px;font-family:'Space Mono',monospace;font-size:clamp(10px,1.3vw,14px);
-    letter-spacing:.34em;text-transform:uppercase;color:#fff;opacity:.85;}
-  .logo .lab b{color:var(--red);}
+  /* cover */
+  .cover{text-align:center;}
+  .cover .logo{height:clamp(90px,17vh,180px);width:auto;filter:invert(1);}
+  .cover .csub{margin-top:26px;font-family:'Space Mono',monospace;font-size:clamp(11px,1.4vw,15px);
+    letter-spacing:.34em;text-transform:uppercase;}
+  .cover .csub b{color:var(--red);}
 
-  /* handdrawn doodles draw-in (around a beat) */
-  .doodle{position:absolute;pointer-events:none;overflow:visible;z-index:4;}
-  .doodle>svg{display:block;width:100%;height:auto;}
-  .doodle path,.doodle line,.doodle polyline{stroke-dasharray:1;stroke-dashoffset:1;
-    transition:stroke-dashoffset 1.3s ease .2s;}
-  .beat.live .doodle path,.beat.live .doodle line,.beat.live .doodle polyline{stroke-dashoffset:0;}
-
-  /* ===== fixed FILM SUBTITLE (bottom of the whole screen) ===== */
+  /* ===== fixed FILM SUBTITLE ===== */
   #sub{position:fixed;left:50%;bottom:max(6%,env(safe-area-inset-bottom));transform:translate(-50%,8px);
     z-index:200;width:min(86vw,1000px);text-align:center;pointer-events:none;
     color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:500;line-height:1.32;
-    font-size:clamp(16px,2.1vw,27px);letter-spacing:.005em;
-    text-shadow:0 0 6px rgba(0,0,0,.6), 1.5px 1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px -1.5px 0 #000;
-    opacity:0;transition:opacity .35s ease, transform .35s ease;}
+    font-size:clamp(16px,2.1vw,27px);
+    text-shadow:0 0 6px rgba(0,0,0,.6),1.5px 1.5px 0 #000,-1.5px 1.5px 0 #000,1.5px -1.5px 0 #000,-1.5px -1.5px 0 #000;
+    opacity:0;transition:opacity .4s ease,transform .4s ease;}
   #sub.show{opacity:1;transform:translate(-50%,0);}
   #sub .nm{color:var(--yellow);font-weight:700;}
 
-  /* ===== THEATRE overlays ===== */
-  /* opening/closing red curtains */
+  /* ===== THEATRE: curtains ===== */
   #curtains{position:fixed;inset:0;z-index:150;pointer-events:none;}
-  .curtain{position:absolute;top:0;height:100%;width:52%;will-change:transform;
+  .curtain{position:absolute;top:0;height:100%;width:51%;will-change:transform;
     background:
-      linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0) 12%, rgba(255,255,255,.06) 24%, rgba(0,0,0,.35) 36%,
-        rgba(255,255,255,.05) 50%, rgba(0,0,0,.4) 62%, rgba(255,255,255,.05) 76%, rgba(0,0,0,.45)),
-      repeating-linear-gradient(90deg,#4e0a0a 0 26px,#7c1515 40px,#9d1d1d 60px,#6c1010 84px,#4e0a0a 110px),
-      #6e1212;
-    box-shadow:inset 0 0 120px rgba(0,0,0,.6);}
-  #curtL{left:0;transform-origin:left center;}
-  #curtR{right:0;transform-origin:right center;}
-  /* scalloped valance on top */
-  #valance{position:fixed;top:0;left:0;width:100%;height:13vh;z-index:151;pointer-events:none;
-    background:repeating-linear-gradient(90deg,#4e0a0a 0 26px,#7c1515 40px,#9d1d1d 60px,#6c1010 84px,#4e0a0a 110px),#6e1212;
-    box-shadow:inset 0 -18px 40px rgba(0,0,0,.6);
-    -webkit-mask:radial-gradient(22px 26px at 50% 0,#000 70%,transparent 72%) 0 100%/64px 100% repeat-x, linear-gradient(#000,#000) 0 0/100% 62% no-repeat;
-            mask:radial-gradient(22px 26px at 50% 0,#000 70%,transparent 72%) 0 100%/64px 100% repeat-x, linear-gradient(#000,#000) 0 0/100% 62% no-repeat;
-    transform:translateY(-101%);transition:transform .5s ease;}
-  #valance.on{transform:translateY(0);}
+      linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,0) 12%,rgba(255,255,255,.06) 24%,rgba(0,0,0,.4) 36%,
+        rgba(255,255,255,.05) 50%,rgba(0,0,0,.45) 62%,rgba(255,255,255,.05) 76%,rgba(0,0,0,.5)),
+      repeating-linear-gradient(90deg,#4e0a0a 0 24px,#7c1515 38px,#9d1d1d 58px,#6c1010 82px,#4e0a0a 108px),#6e1212;
+    box-shadow:inset 0 0 140px rgba(0,0,0,.65);}
+  #curtL{left:0;} #curtR{right:0;}
+  #valance{position:fixed;top:0;left:0;width:100%;height:12vh;z-index:151;pointer-events:none;
+    background:repeating-linear-gradient(90deg,#4e0a0a 0 24px,#7c1515 38px,#9d1d1d 58px,#6c1010 82px,#4e0a0a 108px),#6e1212;
+    box-shadow:inset 0 -16px 40px rgba(0,0,0,.65);
+    -webkit-mask:radial-gradient(20px 24px at 50% 0,#000 70%,transparent 72%) 0 100%/60px 100% repeat-x, linear-gradient(#000,#000) 0 0/100% 60% no-repeat;
+            mask:radial-gradient(20px 24px at 50% 0,#000 70%,transparent 72%) 0 100%/60px 100% repeat-x, linear-gradient(#000,#000) 0 0/100% 60% no-repeat;}
 
-  /* stage spotlight + footlights + floor, fade in on theatre beats */
-  #spot{position:fixed;inset:0;z-index:120;pointer-events:none;opacity:0;transition:opacity .5s ease;
-    background:radial-gradient(60vw 80vh at 50% 36%, rgba(255,240,200,.22), rgba(255,240,200,0) 60%);}
-  #foot{position:fixed;left:0;bottom:0;width:100%;height:16vh;z-index:121;pointer-events:none;opacity:0;transition:opacity .5s ease;
-    background:
-      radial-gradient(closest-side, rgba(255,214,140,.5), rgba(255,214,140,0) 70%) 0 100%/9% 90% repeat-x,
-      linear-gradient(0deg, rgba(255,190,110,.22), rgba(255,190,110,0));}
-  #floor{position:fixed;left:-25%;bottom:0;width:150%;height:42vh;z-index:60;pointer-events:none;opacity:0;transition:opacity .5s ease;
-    transform:perspective(700px) rotateX(64deg);transform-origin:bottom center;
-    background:repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 6%, rgba(40,28,20,.5) 6% 12%),
-      linear-gradient(0deg,#241712,#0d0907);
-    box-shadow:inset 0 40px 70px rgba(0,0,0,.6);}
+  /* ===== THEATRE: stylised (not realistic) lights ===== */
+  #lights{position:fixed;inset:0;z-index:120;pointer-events:none;opacity:0;transition:opacity .7s ease;overflow:hidden;}
+  body.stage #lights{opacity:1;}
+  .beam{position:absolute;top:-20vh;width:46vw;height:150vh;mix-blend-mode:screen;filter:blur(8px);
+    background:linear-gradient(to bottom,rgba(255,238,196,.22),rgba(255,238,196,0) 68%);transform-origin:top center;}
+  #beamL{left:-6vw;transform:rotate(14deg);animation:swayL 7s ease-in-out infinite alternate;}
+  #beamR{right:-6vw;transform:rotate(-14deg);animation:swayR 8s ease-in-out infinite alternate;}
+  @keyframes swayL{from{transform:rotate(10deg);opacity:.7;}to{transform:rotate(18deg);opacity:1;}}
+  @keyframes swayR{from{transform:rotate(-18deg);opacity:1;}to{transform:rotate(-10deg);opacity:.7;}}
+  #spot{position:absolute;inset:0;background:radial-gradient(46vw 60vh at 50% 34%,rgba(255,243,210,.28),rgba(255,243,210,0) 62%);}
+  #foot{position:absolute;left:0;bottom:0;width:100%;height:14vh;
+    background:radial-gradient(closest-side,rgba(255,210,130,.55),rgba(255,210,130,0) 70%) 0 100%/8% 92% repeat-x;}
 
-  /* always-on cinematic vignette */
+  /* vignette + grain */
   #vign{position:fixed;inset:0;z-index:130;pointer-events:none;
-    background:radial-gradient(120vw 120vh at 50% 50%, rgba(0,0,0,0) 58%, rgba(0,0,0,.5));}
+    background:radial-gradient(120vw 120vh at 50% 50%,rgba(0,0,0,0) 56%,rgba(0,0,0,.52));}
   #grain{position:fixed;inset:0;z-index:131;pointer-events:none;mix-blend-mode:overlay;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
-  /* ===== fixed UI ===== */
-  #brand{position:fixed;top:max(15vh,16px);left:max(18px,env(safe-area-inset-left));z-index:210;
+  /* fixed UI */
+  #brand{position:fixed;top:max(14vh,16px);left:max(18px,env(safe-area-inset-left));z-index:160;
     pointer-events:none;mix-blend-mode:difference;color:#fff;}
   #brand .n{font-family:'Oswald',sans-serif;font-size:clamp(14px,1.5vw,19px);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
   #brand .r{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.28em;text-transform:uppercase;opacity:.9;margin-top:3px;}
-  #prog{position:fixed;top:0;left:0;height:4px;width:0;z-index:330;background:var(--red);transition:width .12s linear;}
-  #hint{position:fixed;right:22px;bottom:max(16px,env(safe-area-inset-bottom));z-index:210;font-family:'Space Mono',monospace;font-size:11px;
+  #prog{position:fixed;top:0;left:0;height:4px;width:0;z-index:330;background:var(--red);}
+  #hint{position:fixed;right:22px;bottom:max(16px,env(safe-area-inset-bottom));z-index:160;font-family:'Space Mono',monospace;font-size:11px;
     letter-spacing:.22em;text-transform:uppercase;color:#fff;opacity:.75;transition:opacity .5s;pointer-events:none;mix-blend-mode:difference;}
   #hint.gone{opacity:0;}
 
-  /* ===== focus player ===== */
+  /* focus player */
   #focus{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
     background:rgba(8,8,8,.93);backdrop-filter:blur(6px);padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));}
   #focus.on{display:flex;}
@@ -149,14 +158,19 @@
   #focus .close{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border:2px solid var(--bone);background:var(--red);color:#fff;font-size:21px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
   @media (max-width:760px){
-    .ph img{max-height:56vh;max-width:86vw;}
-    .hero .ph img{max-height:64vh;max-width:90vw;}
-    .land .ph img{max-height:44vh;max-width:94vw;}
-    .small .ph img{max-height:46vh;max-width:74vw;}
-    .vframe{width:90vw;}
-    .word b{font-size:clamp(46px,15vw,90px);white-space:normal;}
-    #sub{font-size:clamp(15px,4.2vw,21px);bottom:9%;}
+    .scene{padding:10vh 7vw;}
+    .shot img{max-height:62vh;max-width:90vw;}
+    .scene.hero .shot img{max-height:70vh;}
+    .scene.land .shot img{max-height:46vh;}
+    .word b{font-size:clamp(46px,16vw,90px);}
+    .ghost{font-size:30vw;}
+    #sub{font-size:clamp(15px,4.2vw,21px);bottom:8%;}
     #focus .meta{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .beam{animation:none;}
+    .reveal{transition:none;}
   }
 </style>
 </head>
@@ -165,11 +179,9 @@
 <div id="bg"></div>
 <div id="prog"></div>
 
-<div id="scene"><div id="world"></div></div>
+<main id="film"></main>
 
-<div id="floor"></div>
-<div id="spot"></div>
-<div id="foot"></div>
+<div id="lights"><div class="beam" id="beamL"></div><div class="beam" id="beamR"></div><div id="spot"></div><div id="foot"></div></div>
 <div id="vign"></div>
 <div id="grain"></div>
 <div id="valance"></div>
@@ -177,7 +189,7 @@
 
 <div id="sub"></div>
 <div id="brand"><div class="n">chiara cucciardi</div><div class="r">attrice · roma</div></div>
-<div id="hint">scorri &rarr;</div>
+<div id="hint">scorri &darr;</div>
 
 <div id="focus">
   <div class="frame">
@@ -189,11 +201,10 @@
 
 <script>
 /* =====================================================================
-   CHIARA CUCCIARDI — un teatro in 3D da attraversare.
-   La camera segue un percorso guidato nello spazio (su/giù/destra/sinistra,
-   piccole rotazioni); le foto successive si intravedono in lontananza.
-   Si apre con le tende rosse, luci di scena nei momenti "teatro".
-   Sottotitoli VERI fissi in fondo allo schermo. Per crescere: BEATS.
+   CHIARA CUCCIARDI — racconto cinematico verticale (semplice e solido).
+   Una foto per scena, sempre intera; elementi Nouvelle Vague sparsi;
+   tende rosse in apertura, luci di scena stilizzate, wash di colore,
+   sottotitoli fissi in fondo. Per crescere: aggiungi voci in SCENES.
    ===================================================================== */
 
   const VIDEOS = [
@@ -209,97 +220,102 @@
     circle:(c)=>`<svg class="doodle" viewBox="0 0 200 120" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"><path pathLength="1" d="M100 8C45 6 14 34 12 62c-3 33 44 52 92 50 41-2 86-22 84-54C186 27 142 9 96 11"/></svg>`,
     arrow:(c)=>`<svg class="doodle" viewBox="0 0 160 120" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M10 14C44 70 86 96 142 100"/><path pathLength="1" d="M112 96l32 6-12-30"/></svg>`,
     underline:(c)=>`<svg class="doodle" viewBox="0 0 320 40" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><path pathLength="1" d="M6 22C70 10 150 30 230 16c36-6 70-8 86-2"/></svg>`,
+    squiggle:(c)=>`<svg class="doodle" viewBox="0 0 260 60" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"><path pathLength="1" d="M6 30c18-26 36 26 54 0s36 26 54 0 36 26 54 0 30 18 40 8"/></svg>`,
   };
 
-  /* ===== BEATS — le stazioni del viaggio (riordina / aggiungi) =====
-     bg: colore scena · stage:true = momento "teatro" (tende+luci)
-     pois:'#colore' dietro la foto · d:[tipo,colore,css] disegno a mano   */
-  const BEATS = [
-    { t:'logo', src:'assets/shot_17.13.21.webp', lab:'attrice · roma · <b>cinema</b> / teatro',
+  /* ===== SCENES — il racconto (riordina / aggiungi) =====
+     bg: colore scena · stage:true = momento teatro (luci)
+     ghost: parola fantasma sullo sfondo · tag: etichetta sparsa
+     pois:'#col' dietro la foto · d:[[tipo,colore,css],...] disegni sparsi   */
+  const SCENES = [
+    { t:'cover', src:'assets/shot_17.13.21.webp', csub:'attrice · roma · <b>cinema</b> / teatro',
       bg:'#0e0e0e', stage:true },
 
-    { t:'photo', src:'assets/shot_17.13.40.webp', size:'hero',
-      sub:'CHIARA CUCCIARDI — attrice', bg:'#39481f' },
+    { t:'photo', src:'assets/shot_17.13.40.webp', cls:'hero', bg:'#39481f',
+      sub:'CHIARA CUCCIARDI — attrice', tag:['ritratto · 2026','top:12%;left:8%'],
+      ghost:['PRÉSENCE','bottom:6%;right:-2%'] },
 
-    { t:'word', lab:'capitolo uno', text:'BANDE À PART', color:'#1733cc', bg:'#0e0e0e' },
+    { t:'word', lab:'capitolo uno', text:'BANDE À PART', color:'#3a64ff', bg:'#0e0e0e', cls:'short' },
 
-    { t:'photo', src:'assets/scale.webp',
-      sub:'«non si sfugge alla gravità — eppure salgo.»', bg:'#16236e',
-      d:['arrow','#ffffff','right:-9%;bottom:6%;width:90px'] },
+    { t:'photo', src:'assets/scale.webp', bg:'#16236e',
+      sub:'«non si sfugge alla gravità — eppure salgo.»',
+      tag:['n°01 · editorial','top:14%;right:9%'],
+      d:[['arrow','#ffffff','right:6%;bottom:12%;width:96px;transform:rotate(8deg)']] },
 
-    { t:'video', v:0, sub:'«guarda — e dimmi cosa vedi.»', bg:'#0e0e0e' },
+    { t:'video', v:0, bg:'#0e0e0e', sub:'«guarda — e dimmi cosa vedi.»',
+      ghost:['REEL','top:8%;left:-2%'] },
 
-    { t:'word', lab:'una donna è una donna', text:'UNE FEMME', color:'#e2231a', bg:'#f3efe4', dark:true },
+    { t:'word', lab:'una donna è una donna', text:'UNE FEMME', color:'#e2231a', bg:'#f3efe4', dark:true, cls:'short' },
 
-    { t:'photo', src:'assets/IMG_7800.webp', pois:'#7a0f0a',
-      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!', bg:'#b5160f' },
+    { t:'photo', src:'assets/IMG_7800.webp', bg:'#b5160f', pois:'#7a0f0a',
+      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!',
+      tag:['dialogo','top:12%;left:9%'],
+      d:[['star','#ffd200','left:7%;bottom:14%;width:74px;transform:rotate(-10deg)']] },
 
-    { t:'word', lab:'pierrot le fou', text:'★', color:'#f5c400', bg:'#15259e' },
+    { t:'word', lab:'pierrot le fou', text:'★', color:'#f5c400', bg:'#15259e', cls:'short' },
 
-    { t:'photo', src:'assets/IMG_7801.webp',
-      sub:'«sono una pietra con il sogno di un battito.»', bg:'#1733cc',
-      d:['star','#f5c400','right:-7%;top:2%;width:84px'] },
+    { t:'photo', src:'assets/IMG_7801.webp', bg:'#1733cc',
+      sub:'«sono una pietra con il sogno di un battito.»',
+      tag:['sogno','top:13%;right:10%'],
+      d:[['star','#f5c400','right:7%;top:14%;width:84px'],['squiggle','#ff8bbf','left:6%;bottom:12%;width:160px']] },
 
-    { t:'video', v:1, sub:'«sei la mia ferita santa.»', bg:'#0e0e0e' },
+    { t:'video', v:1, bg:'#0e0e0e', sub:'«sei la mia ferita santa.»', ghost:['SCÈNE','bottom:6%;right:-2%'] },
 
-    { t:'word', lab:'à bout de souffle', text:'CHI SONO?', color:'#c5872a', bg:'#0e0e0e' },
+    { t:'word', lab:'à bout de souffle', text:'CHI SONO?', color:'#c5872a', bg:'#0e0e0e', cls:'short' },
 
-    { t:'photo', src:'assets/IMG_7803.webp',
-      sub:'<span class="nm">—</span> chi sono io?', bg:'#a8701f',
-      d:['circle','#11543a','left:-9%;top:1%;width:150px'] },
+    { t:'photo', src:'assets/IMG_7803.webp', bg:'#a8701f',
+      sub:'<span class="nm">—</span> chi sono io?',
+      tag:['esistenza · roma','top:12%;left:8%'],
+      d:[['circle','#11543a','left:5%;top:16%;width:150px']] },
 
-    { t:'photo', src:'assets/IMG_7797.webp', pois:'#7c2b3a',
-      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»', bg:'#a83f54' },
+    { t:'photo', src:'assets/IMG_7797.webp', bg:'#a83f54', pois:'#7c2b3a', cls:'',
+      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»',
+      tag:['ritratto · handmade','top:13%;right:9%'] },
 
-    { t:'video', v:2, sub:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»', bg:'#0e0e0e' },
+    { t:'video', v:2, bg:'#0e0e0e', sub:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»' },
 
-    { t:'word', lab:'alphaville', text:'POESIA', color:'#cfc9ff', bg:'#4b4878' },
+    { t:'word', lab:'alphaville', text:'POESIA', color:'#cfc9ff', bg:'#4b4878', cls:'short' },
 
-    { t:'photo', src:'assets/IMG_7792.webp', size:'land',
-      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»', bg:'#5f5b8a' },
+    { t:'photo', src:'assets/IMG_7792.webp', cls:'land', bg:'#5f5b8a',
+      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»',
+      tag:['collage · poesia','top:14%;left:7%'] },
 
-    { t:'word', lab:'théâtre · point zero', text:'I FILI', color:'#e9b84a', bg:'#2c3a16', stage:true },
+    { t:'word', lab:'théâtre · point zero', text:'I FILI', color:'#e9b84a', bg:'#2c3a16', stage:true, cls:'short' },
 
-    { t:'photo', src:'assets/shot_17.14.34.webp', size:'hero',
-      sub:'<span class="nm">—</span> chi tiene i fili?', bg:'#39481f', stage:true,
-      d:['star','#e9b84a','left:-8%;bottom:8%;width:70px'] },
+    { t:'photo', src:'assets/shot_17.14.34.webp', cls:'hero', bg:'#39481f', stage:true,
+      sub:'<span class="nm">—</span> chi tiene i fili?',
+      tag:['teatro · point zero','top:12%;right:9%'],
+      d:[['star','#e9b84a','left:6%;bottom:12%;width:70px']] },
 
-    { t:'photo', src:'assets/IMG_3657.jpg', size:'land',
-      sub:'«and it came with the rain — the surface remains unbroken.»', bg:'#0e0e0e' },
+    { t:'photo', src:'assets/IMG_3657.jpg', cls:'land', bg:'#0e0e0e',
+      sub:'«and it came with the rain — the surface remains unbroken.»',
+      tag:['fotogramma · interno notte','top:13%;left:8%'], ghost:['CINÉMA','bottom:5%;right:-2%'] },
 
-    { t:'photo', src:'assets/tenda.webp',
-      sub:'«con la pioggia — la superficie resta intatta.»', bg:'#5f5b8a' },
+    { t:'photo', src:'assets/tenda.webp', bg:'#5f5b8a',
+      sub:'«con la pioggia — la superficie resta intatta.»',
+      d:[['squiggle','#ffd200','right:6%;top:14%;width:170px']] },
 
-    { t:'photo', src:'assets/chiarabg.webp',
-      sub:'«sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»', bg:'#0e0e0e' },
+    { t:'photo', src:'assets/chiarabg.webp', bg:'#0e0e0e',
+      sub:'«sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»',
+      ghost:['SYMPHONIA','top:7%;left:-2%'] },
 
-    { t:'photo', src:'assets/sgab.webp', size:'small', pois:'#10205e',
-      sub:'«implorammo il cielo un miracolo.»', bg:'#16236e' },
+    { t:'photo', src:'assets/sgab.webp', cls:'small', bg:'#16236e', pois:'#10205e',
+      sub:'«implorammo il cielo un miracolo.»', tag:['baia','top:16%;right:14%'] },
 
-    { t:'video', v:4, sub:'«e venne con la pioggia.»', bg:'#2c3a16' },
+    { t:'video', v:4, bg:'#2c3a16', sub:'«e venne con la pioggia.»' },
 
     { t:'word', lab:'contatti — cleanvillagesrl@gmail.com', text:'FIN', color:'#f5c400',
-      bg:'#1733cc', mail:'cleanvillagesrl@gmail.com', stage:true,
-      d:['underline','#f5c400','left:50%;bottom:12%;width:min(38vw,400px);transform:translateX(-50%)'] },
+      bg:'#1733cc', mail:'cleanvillagesrl@gmail.com', stage:true, cls:'short',
+      d:[['underline','#f5c400','left:50%;bottom:22%;width:min(40vw,420px);transform:translateX(-50%)'],
+         ['star','#f5c400','left:14%;top:18%;width:60px']] },
   ];
 
-  /* path layout in 3D: varied x/y so the camera weaves up/down/left/right */
-  const PX=[0, 560,-520, 380,-300, 600,-560, 320,-460, 520,-360, 460];
-  const PY=[0,-280, 320,-200, 300,-340, 200, 300,-260, 240,-320, 200];
-  const SPACING=1050, FOCUS=420;     // depth between beats / camera distance to focus
-  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const lerp=(a,b,t)=>a+(b-a)*t;
-  const smooth=(e0,e1,x)=>{ const t=clamp((x-e0)/(e1-e0),0,1); return t*t*(3-2*t); };
-
-  const stageW = document.getElementById('world');
-  const sceneEl= document.getElementById('scene');
-  const bgEl   = document.getElementById('bg');
-  const subEl  = document.getElementById('sub');
-  const prog   = document.getElementById('prog');
-  const hint   = document.getElementById('hint');
-  const curtL=document.getElementById('curtL'), curtR=document.getElementById('curtR'),
-        valance=document.getElementById('valance'), spot=document.getElementById('spot'),
-        foot=document.getElementById('foot'), floor=document.getElementById('floor');
+  const film = document.getElementById('film');
+  const bgEl = document.getElementById('bg');
+  const subEl= document.getElementById('sub');
+  const prog = document.getElementById('prog');
+  const hint = document.getElementById('hint');
+  const curtL=document.getElementById('curtL'), curtR=document.getElementById('curtR');
   const focusEl=document.getElementById('focus'), focusFrame=document.getElementById('focusFrame'),
         focusMeta=document.getElementById('focusMeta'), focusClose=document.getElementById('focusClose');
 
@@ -310,131 +326,96 @@
     const hi=new Image(); hi.onload=()=>{ if(hi.naturalWidth>=1000) img.src=hi.src; };
     hi.src='https://i.ytimg.com/vi/'+id+'/maxresdefault.jpg';
   }
+  const doo=(d)=>`<div class="doodle" style="${d[2]}">${DO[d[0]](d[1])}</div>`;
 
-  /* build beats into the 3D world */
-  const beats = [];
-  BEATS.forEach((b,i)=>{
-    const el = document.createElement('div'); el.className='beat';
-    const x = PX[i%PX.length], y = PY[i%PY.length], z = -i*SPACING;
+  /* build scenes */
+  const scenes = [];
+  SCENES.forEach((s,i)=>{
+    const sec=document.createElement('section');
+    sec.className='scene '+(s.cls||'');
     let body='';
-    if (b.t==='logo'){ body=`<div class="logo"><img src="${b.src}" alt="Chiara Cucciardi"><div class="lab">${b.lab||''}</div></div>`; }
-    else if (b.t==='word'){
-      const lab = b.mail ? `<div class="lab" style="margin-top:20px"><a href="mailto:${b.mail}">${b.lab}</a></div>`
-                         : (b.lab?`<div class="lab">${b.lab}</div>`:'');
-      const word = `<b style="color:${b.color||'#fff'}">${b.text}</b>`;
-      body=`<div class="word"${b.dark?' style="color:#0e0e0e"':''}>${b.mail?word+lab:lab+word}</div>`;
+    const ghost = s.ghost?`<div class="ghost" style="${s.ghost[1]}">${s.ghost[0]}</div>`:'';
+    const tag   = s.tag?`<div class="tag reveal" style="${s.tag[1]};--d:.25s">${s.tag[0]}</div>`:'';
+    const draw  = (s.d||[]).map(doo).join('');
+
+    if (s.t==='cover'){
+      sec.classList.add('cover');
+      body=`<div class="stagewrap"><img class="logo reveal" src="${s.src}" alt="Chiara Cucciardi">
+        <div class="csub reveal" style="--d:.18s">${s.csub||''}</div></div>`;
     }
-    else if (b.t==='photo'){
-      body=`<div class="ph">${b.pois?`<div class="poisplane" style="color:${b.pois}"></div>`:''}
-        <img src="${b.src}" alt="" onerror="this.style.opacity=.15"></div>`;
+    else if (s.t==='word'){
+      sec.classList.add('word'); if(s.dark) sec.style.color='#0e0e0e';
+      const lab = s.mail?`<div class="lab"><a href="mailto:${s.mail}">${s.lab}</a></div>`:(s.lab?`<div class="lab reveal">${s.lab}</div>`:'');
+      body=`<div class="stagewrap">${s.mail?'':lab}<b class="reveal" style="color:${s.color||'#fff'}">${s.text}</b>${s.mail?lab:''}</div>${draw}`;
     }
-    else if (b.t==='video'){ const v=VIDEOS[b.v];
-      body=`<div class="vframe" data-vi="${b.v}"><img alt=""><div class="vtag">${v.cat}</div><div class="vplay">&#9654;</div></div>`;
+    else if (s.t==='photo'){
+      body=`${ghost}<figure class="shot reveal" style="margin:0">
+          ${s.pois?`<div class="pois" style="color:${s.pois}"></div>`:''}
+          <img src="${s.src}" alt="" onerror="this.style.opacity=.15"></figure>${tag}${draw}`;
     }
-    if (b.d) body += `<div class="doodle" style="${b.d[2]}">${DO[b.d[0]](b.d[1])}</div>`;
-    if (b.size) el.classList.add(b.size);
-    el.innerHTML = `<div class="inner">${body}</div>`;
-    stageW.appendChild(el);
-    const vf=el.querySelector('.vframe'); if(vf) setThumb(vf.querySelector('img'), VIDEOS[b.v].id);
-    el.querySelectorAll('[data-vi]').forEach(x=> x.addEventListener('click', ()=>{ if(!dragMoved) openFocus(VIDEOS[+x.dataset.vi]); }));
-    beats.push({ ...b, el, x, y, z, yaw:clamp(-x*0.006,-6,6), pitch:clamp(y*0.006,-5,5), vis:true });
+    else if (s.t==='video'){ const v=VIDEOS[s.v];
+      body=`${ghost}<div class="shot reveal"><div class="vframe" data-vi="${s.v}">
+          <img alt=""><div class="vtag">${v.cat}</div><div class="vplay">&#9654;</div></div></div>${tag}${draw}`;
+    }
+
+    sec.innerHTML=body;
+    film.appendChild(sec);
+    const vf=sec.querySelector('.vframe'); if(vf) setThumb(vf.querySelector('img'), VIDEOS[s.v].id);
+    sec.querySelectorAll('[data-vi]').forEach(x=> x.addEventListener('click', ()=> openFocus(VIDEOS[+x.dataset.vi])));
+    scenes.push({ ...s, el:sec });
   });
 
-  const N = beats.length;
-  const hex = h => { h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; };
-  const COL = BEATS.map(b=>hex(b.bg||'#0e0e0e'));
-  const STAGE = beats.map(b=>!!b.stage);
+  /* reveal on enter */
+  const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }),
+    { threshold:0.18 });
+  scenes.forEach(s=>io.observe(s.el));
 
-  /* ===== virtual scroll = the guided camera ===== */
-  let STEP = window.innerWidth;
-  let maxS = (N-1)*STEP;
-  let cur=0, targetS=0, raf=null, curSub=-1, subT=null;
-  let dragMoved=false;
+  /* parallax base transforms for scattered depth */
+  function tagDepth(el){ return el.classList.contains('ghost')?0.12: el.classList.contains('tag')?0.20: el.classList.contains('doodle')?0.16:0.06; }
 
-  function kick(){ if(!raf) raf=requestAnimationFrame(frame); }
-  function frame(){
-    cur += (targetS-cur)*0.12;
-    if(Math.abs(targetS-cur)<0.4) cur=targetS;
-    render();
-    raf = (cur!==targetS) ? requestAnimationFrame(frame) : null;
-  }
-
-  function rgbLerp(i,j,t){ const a=COL[i],b=COL[j]; return `rgb(${Math.round(lerp(a[0],b[0],t))},${Math.round(lerp(a[1],b[1],t))},${Math.round(lerp(a[2],b[2],t))})`; }
-
+  /* ===== single scroll pass: active scene, colour, subtitle, lights, curtains, parallax ===== */
+  let active=-1, ticking=false;
   function render(){
-    const f = clamp(cur/STEP, 0, N-1);
-    const k = Math.floor(f), t = f-k, k1=Math.min(k+1,N-1);
+    ticking=false;
+    const vh=innerHeight, sc=scrollY, center=sc+vh/2;
+    const docH=document.body.scrollHeight-vh;
+    prog.style.width=(docH>0? sc/docH*100:0)+'%';
+    if(sc>30) hint.classList.add('gone');
 
-    /* scene color wash */
-    bgEl.style.backgroundColor = rgbLerp(k,k1,t);
+    /* curtains open across the first viewport */
+    const open=Math.min(1, sc/(vh*0.7));
+    curtL.style.transform=`translateX(${(-100*open).toFixed(1)}%)`;
+    curtR.style.transform=`translateX(${( 100*open).toFixed(1)}%)`;
 
-    /* camera pose: center focus + small guided rotation */
-    const camX = lerp(beats[k].x, beats[k1].x, t);
-    const camY = lerp(beats[k].y, beats[k1].y, t);
-    const yaw  = lerp(beats[k].yaw, beats[k1].yaw, t);
-    const pitch= lerp(beats[k].pitch, beats[k1].pitch, t);
-    const camZ = f*SPACING - FOCUS;
-    stageW.style.transform =
-      `rotateX(${pitch.toFixed(2)}deg) rotateY(${yaw.toFixed(2)}deg) translate3d(${(-camX).toFixed(1)}px, ${(-camY).toFixed(1)}px, ${camZ.toFixed(1)}px)`;
-
-    /* per-beat opacity / culling / interactivity */
-    for(let i=0;i<N;i++){ const b=beats[i], delta=i-f, ad=Math.abs(delta);
-      if(ad>6){ if(b.vis){ b.el.style.display='none'; b.vis=false; b.el.classList.remove('live'); } continue; }
-      if(!b.vis){ b.el.style.display=''; b.vis=true; }
-      let op;
-      if(delta<0) op = clamp((delta+0.5)/0.5, 0, 1);          // fade as it passes the camera
-      else op = delta<=2 ? 1 : Math.max(0, 1-(delta-2)/3.2);  // distant previews fade softly
-      b.el.style.opacity = op.toFixed(3);
-      b.el.style.pointerEvents = ad<0.5 ? 'auto' : 'none';
-      if(ad<0.4) b.el.classList.add('live'); else b.el.classList.remove('live');
+    /* find active scene (its box crosses viewport centre) */
+    let act=active<0?0:active;
+    for(let i=0;i<scenes.length;i++){ const r=scenes[i].el.getBoundingClientRect();
+      if(r.top<=vh*0.5 && r.bottom>=vh*0.5){ act=i; break; } }
+    if(act!==active){ active=act; const s=scenes[act];
+      bgEl.style.backgroundColor=s.bg||'#0e0e0e';
+      document.body.classList.toggle('stage', !!s.stage);
+      // subtitle swap
+      subEl.classList.remove('show');
+      clearTimeout(render._t);
+      render._t=setTimeout(()=>{ if(s.sub){ subEl.innerHTML=s.sub; subEl.classList.add('show'); } },140);
     }
 
-    /* subtitle (fixed, bottom) follows the focused beat */
-    const fi = Math.round(f);
-    if(fi!==curSub){ curSub=fi;
-      subEl.classList.remove('show'); clearTimeout(subT);
-      subT=setTimeout(()=>{ const s=BEATS[fi].sub; if(s){ subEl.innerHTML=s; subEl.classList.add('show'); } }, 170);
+    /* parallax: only scenes near the viewport */
+    for(let i=Math.max(0,active-1);i<=Math.min(scenes.length-1,active+1);i++){
+      const sObj=scenes[i], r=sObj.el.getBoundingClientRect(), mid=r.top+r.height/2-vh/2;
+      sObj.el.querySelectorAll('.ghost,.doodle').forEach(el=>{
+        const d=tagDepth(el), base=el.dataset.rot||'';
+        el.style.transform=`${base} translateY(${(-mid*d).toFixed(1)}px)`;
+      });
     }
-
-    /* progress + hint */
-    prog.style.width = (maxS>0? cur/maxS*100 : 0)+'%';
-    if(cur>40) hint.classList.add('gone');
-
-    /* ===== THEATRE ===== */
-    // curtains: closed at the very start and very end, open in between
-    const coverIn  = 1 - smooth(0.06, 0.6, f);          // 1 → 0 over first beats
-    const coverOut = smooth(N-1.7, N-1.05, f);           // 0 → 1 near the finale
-    const cover = Math.max(coverIn, coverOut);
-    curtL.style.transform = `translateX(${(-100*(1-cover)).toFixed(1)}%)`;
-    curtR.style.transform = `translateX(${( 100*(1-cover)).toFixed(1)}%)`;
-    // stage amount = proximity to a "stage" beat
-    let stageAmt=0;
-    for(let i=0;i<N;i++){ if(STAGE[i]) stageAmt=Math.max(stageAmt, 1-clamp(Math.abs(i-f)/0.85,0,1)); }
-    valance.classList.toggle('on', stageAmt>0.15 || cover>0.2);
-    spot.style.opacity  = (stageAmt*0.9).toFixed(3);
-    foot.style.opacity  = (stageAmt).toFixed(3);
-    floor.style.opacity = (stageAmt*0.85).toFixed(3);
   }
+  /* keep original rotation of doodles so parallax doesn't wipe it */
+  scenes.forEach(s=> s.el.querySelectorAll('.doodle').forEach(el=>{
+    const m=(el.getAttribute('style')||'').match(/transform:([^;]+)/); if(m) el.dataset.rot=m[1].trim();
+  }));
 
-  /* ===== input ===== */
-  function addS(d){ targetS = clamp(targetS + d, 0, maxS); kick(); }
-  window.addEventListener('wheel', e=>{ if(focusOpen()) return; e.preventDefault();
-    addS((Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX) * 1.15); }, { passive:false });
-  document.addEventListener('keydown', e=>{ if(focusOpen()) return;
-    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') addS(STEP*0.85);
-    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   addS(-STEP*0.85); });
-
-  /* drag / swipe */
-  let down=false, px=0, baseS=0;
-  function pdown(x){ down=true; dragMoved=false; px=x; baseS=targetS; document.body.classList.add('dragging'); if(raf){cancelAnimationFrame(raf);raf=null;} }
-  function pmove(x){ if(!down) return; const dx=x-px; if(Math.abs(dx)>4) dragMoved=true; targetS=clamp(baseS-dx*1.6,0,maxS); cur=targetS; render(); }
-  function pup(){ if(down){ down=false; document.body.classList.remove('dragging'); setTimeout(()=>dragMoved=false,30); } }
-  sceneEl.addEventListener('pointerdown', e=>{ if(e.pointerType!=='touch') pdown(e.clientX); });
-  window.addEventListener('pointermove', e=>{ if(e.pointerType!=='touch') pmove(e.clientX); });
-  window.addEventListener('pointerup', pup);
-  sceneEl.addEventListener('touchstart', e=>{ pdown(e.touches[0].clientX); }, {passive:true});
-  sceneEl.addEventListener('touchmove', e=>{ pmove(e.touches[0].clientX); }, {passive:true});
-  sceneEl.addEventListener('touchend', pup);
+  addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(render); } }, { passive:true });
+  addEventListener('resize', render);
 
   /* ===== focus player ===== */
   const focusOpen = () => focusEl.classList.contains('on');
@@ -449,7 +430,8 @@
   focusEl.addEventListener('click', e=>{ if(e.target===focusEl) closeFocus(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeFocus(); });
 
-  window.addEventListener('resize', ()=>{ STEP=window.innerWidth; maxS=(N-1)*STEP; targetS=clamp(targetS,0,maxS); cur=clamp(cur,0,maxS); render(); });
+  /* go */
+  scenes[0].el.classList.add('in');
   render();
 </script>
 </body>
