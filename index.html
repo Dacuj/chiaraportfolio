@@ -72,6 +72,10 @@
     box-shadow:0 30px 70px rgba(0,0,0,.4);background:var(--paper);}
 
   /* ===== CONTACT SHEET (provini) ===== */
+  .sec.contact{overflow:visible;}
+  .chead{text-align:center;margin-bottom:3vh;}
+  .chead .ct{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(30px,5vw,64px);letter-spacing:.02em;}
+  .chead .cp{display:block;font-family:'Space Mono',monospace;font-size:clamp(10px,1.2vw,13px);letter-spacing:.26em;text-transform:uppercase;opacity:.7;margin-top:8px;}
   .contact{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;width:min(86vw,720px);}
   .contact .f{position:relative;aspect-ratio:3/4;background:#fff;padding:4px;cursor:zoom-in;
     box-shadow:0 8px 22px rgba(0,0,0,.35);}
@@ -210,9 +214,12 @@
     .shot img{max-height:60vh;max-width:88vw;}
     .quad img{height:42vh;max-height:42vh;}
     .word b{font-size:clamp(46px,15vw,92px);}
-    .hero .pic img{max-height:64vh;max-width:90vw;}
-    .hero .sig{font-size:clamp(40px,13vw,80px);bottom:7vh;}
-    .hero .role{top:11vh;}
+    .hero{padding-top:0;}
+    .hero .pic img{max-height:52vh;max-width:88vw;}
+    .hero .sig{top:max(12vh,84px);bottom:auto;left:6vw;right:6vw;font-size:clamp(44px,13vw,80px);line-height:.84;}
+    .hero .role{display:none;}
+    .contact{grid-template-columns:repeat(2,1fr);width:92vw;gap:8px;}
+    .chead .ct{font-size:clamp(26px,7vw,40px);}
     #sub{font-size:clamp(15px,4.2vw,21px);bottom:8%;}
     #brand{display:none;}
     #hint{display:none;}
@@ -278,7 +285,7 @@
 
     { t:'word', nav:'Bande à part', lab:'capitolo uno', text:'BANDE À PART', color:'#3a64ff', bg:'#0e0e0e' },
 
-    { t:'contact', nav:'Provini', title:'I VOLTI', bg:'#101010', sub:'venti modi di esserci',
+    { t:'contact', nav:'Provini', title:'I VOLTI', bg:'#101010', cap:'venti modi di esserci',
       srcs:['assets/shot_17.13.40.webp','assets/IMG_7797.webp','assets/IMG_7803.webp','assets/IMG_7800.webp',
             'assets/IMG_7801.webp','assets/shot_17.14.34.webp','assets/IMG_3657.jpg','assets/tenda.webp'] },
 
@@ -412,7 +419,7 @@
     }
     else if(s.t==='contact'){
       const f=s.srcs.map(src=>`<div class="f" data-full="${src}"><img src="${src}" alt="" loading="lazy"></div>`).join('');
-      inner=`<div class="tag reveal" style="top:6%;left:6%">${s.title||'provini'}</div><div class="contact reveal" style="--d:.1s">${f}</div>`;
+      inner=`<div class="chead reveal"><span class="ct">${s.title||'provini'}</span><span class="cp">${s.cap||''}</span></div><div class="contact reveal" style="--d:.1s">${f}</div>`;
     }
     else if(s.t==='video'){ const v=VIDEOS[s.v];
       inner=`${ghost}<div class="vframe reveal" data-vi="${s.v}"><img alt=""><div class="vtag">${v.cat}</div><div class="vplay">&#9654;</div></div>${tag}`;
