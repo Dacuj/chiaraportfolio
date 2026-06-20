@@ -15,48 +15,40 @@
     --ink:#0e0e0e; --paper:#f3efe4; --bone:#fbf9f2;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;height:100%;width:100%;overflow:hidden;background:#0e0e0e;}
-  body{color:#fff;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  html,body{margin:0;height:100%;width:100%;overflow:hidden;background:#080808;}
+  body{color:#fff;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;
+    touch-action:none;cursor:grab;}
+  body.dragging{cursor:grabbing;}
 
-  /* color-wash background of the "film" */
-  #bg{position:fixed;inset:0;z-index:0;background:#0e0e0e;transition:background-color .15s linear;}
-  #bg::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:.05;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  /* scene color wash behind the 3D world */
+  #bg{position:fixed;inset:0;z-index:0;background:#0e0e0e;transition:background-color .12s linear;}
 
-  /* horizontal transport = the camera moving through the reel */
-  #track{position:relative;z-index:1;height:100%;width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;}
-  #track::-webkit-scrollbar{display:none;}
-  #stage{position:relative;height:100%;}
+  /* ===== 3D theatre space ===== */
+  #scene{position:fixed;inset:0;z-index:1;overflow:hidden;perspective:1500px;perspective-origin:50% 48%;}
+  #world{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;will-change:transform;}
 
-  /* a "beat" = a moment in the journey (photo / video / word) */
-  .beat{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);will-change:transform,opacity;}
-  .beat.hidden{visibility:hidden;}
+  .beat{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform,opacity;}
+  .beat .inner{position:relative;transform:translate(-50%,-50%);}
 
-  /* ---- photo: shown whole, never cropped ---- */
-  .ph{position:relative;display:inline-block;line-height:0;}
-  .ph img{display:block;width:auto;height:auto;max-height:70vh;max-width:48vw;
-    box-shadow:0 34px 80px rgba(0,0,0,.5);}
-  .beat.hero  .ph img{max-height:84vh;max-width:54vw;}
-  .beat.land  .ph img{max-height:60vh;max-width:78vw;}
-  .beat.small .ph img{max-height:52vh;max-width:38vw;}
+  /* photo — shown whole, never cropped, no text on it */
+  .ph{position:relative;line-height:0;}
+  .ph img{display:block;width:auto;height:auto;max-height:80vh;max-width:52vw;
+    box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.15);}
+  .hero  .ph img{max-height:90vh;max-width:58vw;}
+  .land  .ph img{max-height:66vh;max-width:82vw;}
+  .small .ph img{max-height:58vh;max-width:42vw;}
 
-  /* burned-in film subtitle */
-  .ph.cap::after,.vframe.cap::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;pointer-events:none;
-    background:linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0));}
-  .sub{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);z-index:3;width:92%;text-align:center;
-    color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:500;line-height:1.3;
-    font-size:clamp(15px,1.9vw,25px);letter-spacing:.005em;
-    text-shadow:0 0 5px rgba(0,0,0,.5), 1.4px 1.4px 0 #000, -1.4px 1.4px 0 #000, 1.4px -1.4px 0 #000, -1.4px -1.4px 0 #000;
-    opacity:0;transition:opacity .6s ease .15s, transform .6s ease .15s;}
-  .beat.live .sub{opacity:1;}
-  .sub .nm{color:var(--yellow);font-weight:700;}
+  /* pois plane behind a photo (sits a touch deeper in 3D) */
+  .poisplane{position:absolute;left:50%;top:50%;width:135%;height:118%;transform:translate(-50%,-50%) translateZ(-40px);
+    z-index:-1;background-image:radial-gradient(currentColor 22%,transparent 24%);
+    background-size:clamp(22px,2.6vw,34px) clamp(22px,2.6vw,34px);opacity:.6;}
 
-  /* ---- video: reliable thumbnail, always clickable ---- */
-  .vframe{position:relative;width:52vw;max-width:760px;aspect-ratio:16/9;cursor:pointer;overflow:hidden;
-    background:#111;box-shadow:0 34px 80px rgba(0,0,0,.5);}
-  .vframe img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.15) contrast(1.03);}
+  /* video — reliable cover, always clickable */
+  .vframe{position:relative;width:56vw;max-width:780px;aspect-ratio:16/9;cursor:pointer;overflow:hidden;
+    background:#111;box-shadow:0 40px 90px rgba(0,0,0,.55);}
+  .vframe img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.12) contrast(1.03);}
   .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:clamp(64px,6.5vw,92px);aspect-ratio:1;border-radius:50%;background:var(--red);
+    width:clamp(64px,6.5vw,94px);aspect-ratio:1;border-radius:50%;background:var(--red);
     border:3px solid var(--bone);display:flex;align-items:center;justify-content:center;
     color:var(--bone);font-size:clamp(20px,2vw,28px);padding-left:5px;z-index:2;
     transition:transform .3s, background .3s;box-shadow:0 10px 28px rgba(0,0,0,.4);}
@@ -64,36 +56,85 @@
   .vtag{position:absolute;top:14px;left:14px;z-index:3;font-family:'Space Mono',monospace;font-size:11px;
     letter-spacing:.22em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.45);padding:5px 9px;}
 
-  /* ---- word / intertitle ---- */
-  .beat.word{text-align:center;}
+  /* word / intertitle */
+  .word{text-align:center;}
   .word b{display:block;font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.82;
-    font-size:clamp(54px,11vw,168px);letter-spacing:0;transition:letter-spacing 1s cubic-bezier(.2,.7,.2,1);}
-  .beat.live .word b{letter-spacing:.03em;}
+    font-size:clamp(58px,11vw,176px);letter-spacing:.02em;white-space:nowrap;}
   .word .lab{font-family:'Space Mono',monospace;font-size:clamp(10px,1.2vw,13px);letter-spacing:.32em;
-    text-transform:uppercase;opacity:.72;margin-bottom:18px;color:inherit;}
+    text-transform:uppercase;opacity:.75;margin-bottom:18px;color:inherit;}
   .word .lab a{color:inherit;}
 
-  /* ---- handdrawn logo ---- */
-  .beat.logo{text-align:center;}
-  .logo img{height:clamp(74px,15vh,150px);width:auto;filter:invert(1);}
+  /* handdrawn logo */
+  .logo{text-align:center;}
+  .logo img{height:clamp(80px,15vh,160px);width:auto;filter:invert(1);}
   .logo .lab{margin-top:22px;font-family:'Space Mono',monospace;font-size:clamp(10px,1.3vw,14px);
     letter-spacing:.34em;text-transform:uppercase;color:#fff;opacity:.85;}
   .logo .lab b{color:var(--red);}
 
-  /* handdrawn doodles draw-in */
+  /* handdrawn doodles draw-in (around a beat) */
   .doodle{position:absolute;pointer-events:none;overflow:visible;z-index:4;}
   .doodle>svg{display:block;width:100%;height:auto;}
   .doodle path,.doodle line,.doodle polyline{stroke-dasharray:1;stroke-dashoffset:1;
     transition:stroke-dashoffset 1.3s ease .2s;}
   .beat.live .doodle path,.beat.live .doodle line,.beat.live .doodle polyline{stroke-dashoffset:0;}
 
+  /* ===== fixed FILM SUBTITLE (bottom of the whole screen) ===== */
+  #sub{position:fixed;left:50%;bottom:max(6%,env(safe-area-inset-bottom));transform:translate(-50%,8px);
+    z-index:200;width:min(86vw,1000px);text-align:center;pointer-events:none;
+    color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:500;line-height:1.32;
+    font-size:clamp(16px,2.1vw,27px);letter-spacing:.005em;
+    text-shadow:0 0 6px rgba(0,0,0,.6), 1.5px 1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px -1.5px 0 #000;
+    opacity:0;transition:opacity .35s ease, transform .35s ease;}
+  #sub.show{opacity:1;transform:translate(-50%,0);}
+  #sub .nm{color:var(--yellow);font-weight:700;}
+
+  /* ===== THEATRE overlays ===== */
+  /* opening/closing red curtains */
+  #curtains{position:fixed;inset:0;z-index:150;pointer-events:none;}
+  .curtain{position:absolute;top:0;height:100%;width:52%;will-change:transform;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0) 12%, rgba(255,255,255,.06) 24%, rgba(0,0,0,.35) 36%,
+        rgba(255,255,255,.05) 50%, rgba(0,0,0,.4) 62%, rgba(255,255,255,.05) 76%, rgba(0,0,0,.45)),
+      repeating-linear-gradient(90deg,#4e0a0a 0 26px,#7c1515 40px,#9d1d1d 60px,#6c1010 84px,#4e0a0a 110px),
+      #6e1212;
+    box-shadow:inset 0 0 120px rgba(0,0,0,.6);}
+  #curtL{left:0;transform-origin:left center;}
+  #curtR{right:0;transform-origin:right center;}
+  /* scalloped valance on top */
+  #valance{position:fixed;top:0;left:0;width:100%;height:13vh;z-index:151;pointer-events:none;
+    background:repeating-linear-gradient(90deg,#4e0a0a 0 26px,#7c1515 40px,#9d1d1d 60px,#6c1010 84px,#4e0a0a 110px),#6e1212;
+    box-shadow:inset 0 -18px 40px rgba(0,0,0,.6);
+    -webkit-mask:radial-gradient(22px 26px at 50% 0,#000 70%,transparent 72%) 0 100%/64px 100% repeat-x, linear-gradient(#000,#000) 0 0/100% 62% no-repeat;
+            mask:radial-gradient(22px 26px at 50% 0,#000 70%,transparent 72%) 0 100%/64px 100% repeat-x, linear-gradient(#000,#000) 0 0/100% 62% no-repeat;
+    transform:translateY(-101%);transition:transform .5s ease;}
+  #valance.on{transform:translateY(0);}
+
+  /* stage spotlight + footlights + floor, fade in on theatre beats */
+  #spot{position:fixed;inset:0;z-index:120;pointer-events:none;opacity:0;transition:opacity .5s ease;
+    background:radial-gradient(60vw 80vh at 50% 36%, rgba(255,240,200,.22), rgba(255,240,200,0) 60%);}
+  #foot{position:fixed;left:0;bottom:0;width:100%;height:16vh;z-index:121;pointer-events:none;opacity:0;transition:opacity .5s ease;
+    background:
+      radial-gradient(closest-side, rgba(255,214,140,.5), rgba(255,214,140,0) 70%) 0 100%/9% 90% repeat-x,
+      linear-gradient(0deg, rgba(255,190,110,.22), rgba(255,190,110,0));}
+  #floor{position:fixed;left:-25%;bottom:0;width:150%;height:42vh;z-index:60;pointer-events:none;opacity:0;transition:opacity .5s ease;
+    transform:perspective(700px) rotateX(64deg);transform-origin:bottom center;
+    background:repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 6%, rgba(40,28,20,.5) 6% 12%),
+      linear-gradient(0deg,#241712,#0d0907);
+    box-shadow:inset 0 40px 70px rgba(0,0,0,.6);}
+
+  /* always-on cinematic vignette */
+  #vign{position:fixed;inset:0;z-index:130;pointer-events:none;
+    background:radial-gradient(120vw 120vh at 50% 50%, rgba(0,0,0,0) 58%, rgba(0,0,0,.5));}
+  #grain{position:fixed;inset:0;z-index:131;pointer-events:none;mix-blend-mode:overlay;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
   /* ===== fixed UI ===== */
-  #brand{position:fixed;top:max(16px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left));z-index:320;
+  #brand{position:fixed;top:max(15vh,16px);left:max(18px,env(safe-area-inset-left));z-index:210;
     pointer-events:none;mix-blend-mode:difference;color:#fff;}
   #brand .n{font-family:'Oswald',sans-serif;font-size:clamp(14px,1.5vw,19px);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
   #brand .r{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.28em;text-transform:uppercase;opacity:.9;margin-top:3px;}
   #prog{position:fixed;top:0;left:0;height:4px;width:0;z-index:330;background:var(--red);transition:width .12s linear;}
-  #hint{position:fixed;right:22px;bottom:max(16px,env(safe-area-inset-bottom));z-index:300;font-family:'Space Mono',monospace;font-size:11px;
+  #hint{position:fixed;right:22px;bottom:max(16px,env(safe-area-inset-bottom));z-index:210;font-family:'Space Mono',monospace;font-size:11px;
     letter-spacing:.22em;text-transform:uppercase;color:#fff;opacity:.75;transition:opacity .5s;pointer-events:none;mix-blend-mode:difference;}
   #hint.gone{opacity:0;}
 
@@ -108,17 +149,14 @@
   #focus .close{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border:2px solid var(--bone);background:var(--red);color:#fff;font-size:21px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
   @media (max-width:760px){
-    .ph img{max-height:54vh;max-width:84vw;}
-    .beat.hero .ph img{max-height:64vh;max-width:88vw;}
-    .beat.land .ph img{max-height:42vh;max-width:92vw;}
-    .beat.small .ph img{max-height:42vh;max-width:70vw;}
-    .vframe{width:88vw;}
-    .sub{font-size:clamp(14px,4vw,20px);}
+    .ph img{max-height:56vh;max-width:86vw;}
+    .hero .ph img{max-height:64vh;max-width:90vw;}
+    .land .ph img{max-height:44vh;max-width:94vw;}
+    .small .ph img{max-height:46vh;max-width:74vw;}
+    .vframe{width:90vw;}
+    .word b{font-size:clamp(46px,15vw,90px);white-space:normal;}
+    #sub{font-size:clamp(15px,4.2vw,21px);bottom:9%;}
     #focus .meta{display:none;}
-  }
-  @media (prefers-reduced-motion:reduce){
-    .doodle path,.doodle line,.doodle polyline{transition:none;stroke-dashoffset:0;}
-    .word b{transition:none;}
   }
 </style>
 </head>
@@ -126,8 +164,18 @@
 
 <div id="bg"></div>
 <div id="prog"></div>
-<div id="track"><div id="stage"></div></div>
 
+<div id="scene"><div id="world"></div></div>
+
+<div id="floor"></div>
+<div id="spot"></div>
+<div id="foot"></div>
+<div id="vign"></div>
+<div id="grain"></div>
+<div id="valance"></div>
+<div id="curtains"><div class="curtain" id="curtL"></div><div class="curtain" id="curtR"></div></div>
+
+<div id="sub"></div>
 <div id="brand"><div class="n">chiara cucciardi</div><div class="r">attrice · roma</div></div>
 <div id="hint">scorri &rarr;</div>
 
@@ -141,12 +189,11 @@
 
 <script>
 /* =====================================================================
-   CHIARA CUCCIARDI — una pellicola da scorrere.
-   Non pagine: un viaggio. Scorrendo, la "camera" attraversa una lunga
-   sequenza; le foto galleggiano dentro e fuori (entrano, si avvicinano,
-   sfumano), i colori cambiano come scene, appaiono parole-intertitolo e
-   disegni a mano. Sottotitoli "stampati" nel fotogramma, stile film.
-   Per aggiungere materiale: inserisci voci in BEATS.
+   CHIARA CUCCIARDI — un teatro in 3D da attraversare.
+   La camera segue un percorso guidato nello spazio (su/giù/destra/sinistra,
+   piccole rotazioni); le foto successive si intravedono in lontananza.
+   Si apre con le tende rosse, luci di scena nei momenti "teatro".
+   Sottotitoli VERI fissi in fondo allo schermo. Per crescere: BEATS.
    ===================================================================== */
 
   const VIDEOS = [
@@ -164,193 +211,230 @@
     underline:(c)=>`<svg class="doodle" viewBox="0 0 320 40" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><path pathLength="1" d="M6 22C70 10 150 30 230 16c36-6 70-8 86-2"/></svg>`,
   };
 
-  /* ===== BEATS — la sequenza del viaggio (riordina / aggiungi) =====
-     gap: spazio (in schermate) prima del beat successivo
-     bg : colore della scena (transizione morbida tra un beat e l'altro)
-     y  : scostamento verticale (vh)   rot: rotazione (deg)
-     d  : disegno a mano [tipo, colore, css-posizione]                    */
+  /* ===== BEATS — le stazioni del viaggio (riordina / aggiungi) =====
+     bg: colore scena · stage:true = momento "teatro" (tende+luci)
+     pois:'#colore' dietro la foto · d:[tipo,colore,css] disegno a mano   */
   const BEATS = [
     { t:'logo', src:'assets/shot_17.13.21.webp', lab:'attrice · roma · <b>cinema</b> / teatro',
-      gap:1.05, bg:'#0e0e0e' },
+      bg:'#0e0e0e', stage:true },
 
-    { t:'photo', src:'assets/shot_17.13.40.webp', size:'hero', y:-3, rot:-1,
-      sub:'CHIARA CUCCIARDI — attrice', gap:1.25, bg:'#39481f' },
+    { t:'photo', src:'assets/shot_17.13.40.webp', size:'hero',
+      sub:'CHIARA CUCCIARDI — attrice', bg:'#39481f' },
 
-    { t:'word', lab:'capitolo uno', text:'BANDE<br>À PART', color:'#1733cc',
-      gap:0.78, bg:'#0e0e0e' },
+    { t:'word', lab:'capitolo uno', text:'BANDE À PART', color:'#1733cc', bg:'#0e0e0e' },
 
-    { t:'photo', src:'assets/scale.webp', y:-2, rot:1.2,
-      sub:'«non si sfugge alla gravità — eppure salgo.»', gap:1.15, bg:'#16236e',
-      d:['arrow','#ffffff','right:-8%;bottom:8%;width:90px'] },
+    { t:'photo', src:'assets/scale.webp',
+      sub:'«non si sfugge alla gravità — eppure salgo.»', bg:'#16236e',
+      d:['arrow','#ffffff','right:-9%;bottom:6%;width:90px'] },
 
-    { t:'video', v:0, sub:'«guarda — e dimmi cosa vedi.»', gap:1.15, bg:'#0e0e0e' },
+    { t:'video', v:0, sub:'«guarda — e dimmi cosa vedi.»', bg:'#0e0e0e' },
 
-    { t:'word', lab:'una donna è una donna', text:'UNE<br>FEMME', color:'#e2231a',
-      gap:0.78, bg:'#f3efe4', dark:true },
+    { t:'word', lab:'una donna è una donna', text:'UNE FEMME', color:'#e2231a', bg:'#f3efe4', dark:true },
 
-    { t:'photo', src:'assets/IMG_7800.webp', y:0, rot:-1.4,
-      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!', gap:1.2, bg:'#b5160f' },
+    { t:'photo', src:'assets/IMG_7800.webp', pois:'#7a0f0a',
+      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!', bg:'#b5160f' },
 
-    { t:'word', lab:'pierrot le fou', text:'★', color:'#f5c400',
-      gap:0.6, bg:'#15259e' },
+    { t:'word', lab:'pierrot le fou', text:'★', color:'#f5c400', bg:'#15259e' },
 
-    { t:'photo', src:'assets/IMG_7801.webp', y:-2, rot:1,
-      sub:'«sono una pietra con il sogno di un battito.»', gap:1.15, bg:'#1733cc',
-      d:['star','#f5c400','right:-6%;top:4%;width:84px'] },
+    { t:'photo', src:'assets/IMG_7801.webp',
+      sub:'«sono una pietra con il sogno di un battito.»', bg:'#1733cc',
+      d:['star','#f5c400','right:-7%;top:2%;width:84px'] },
 
-    { t:'video', v:1, sub:'«sei la mia ferita santa.»', gap:1.15, bg:'#0e0e0e' },
+    { t:'video', v:1, sub:'«sei la mia ferita santa.»', bg:'#0e0e0e' },
 
-    { t:'word', lab:'à bout de souffle', text:'CHI<br>SONO?', color:'#c5872a',
-      gap:0.78, bg:'#0e0e0e' },
+    { t:'word', lab:'à bout de souffle', text:'CHI SONO?', color:'#c5872a', bg:'#0e0e0e' },
 
-    { t:'photo', src:'assets/IMG_7803.webp', y:-2, rot:-1,
-      sub:'<span class="nm">—</span> chi sono io?', gap:1.1, bg:'#b07522',
-      d:['circle','#11543a','left:-8%;top:2%;width:150px'] },
+    { t:'photo', src:'assets/IMG_7803.webp',
+      sub:'<span class="nm">—</span> chi sono io?', bg:'#a8701f',
+      d:['circle','#11543a','left:-9%;top:1%;width:150px'] },
 
-    { t:'photo', src:'assets/IMG_7797.webp', y:0, rot:1.3,
-      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»', gap:1.15, bg:'#a83f54' },
+    { t:'photo', src:'assets/IMG_7797.webp', pois:'#7c2b3a',
+      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»', bg:'#a83f54' },
 
-    { t:'video', v:2, sub:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»', gap:1.15, bg:'#0e0e0e' },
+    { t:'video', v:2, sub:'«sanguino un “sì” per il tuo forse. bruciami, veleno benedetto.»', bg:'#0e0e0e' },
 
-    { t:'word', lab:'alphaville', text:'POESIA', color:'#cfc9ff',
-      gap:0.7, bg:'#4b4878' },
+    { t:'word', lab:'alphaville', text:'POESIA', color:'#cfc9ff', bg:'#4b4878' },
 
-    { t:'photo', src:'assets/IMG_7792.webp', size:'land', y:-2, rot:-1,
-      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»', gap:1.2, bg:'#5f5b8a' },
+    { t:'photo', src:'assets/IMG_7792.webp', size:'land',
+      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»', bg:'#5f5b8a' },
 
-    { t:'word', lab:'théâtre · point zero', text:'I FILI', color:'#e9b84a',
-      gap:0.7, bg:'#2c3a16' },
+    { t:'word', lab:'théâtre · point zero', text:'I FILI', color:'#e9b84a', bg:'#2c3a16', stage:true },
 
-    { t:'photo', src:'assets/shot_17.14.34.webp', size:'hero', y:-2, rot:1,
-      sub:'<span class="nm">—</span> chi tiene i fili?', gap:1.2, bg:'#39481f',
-      d:['star','#e9b84a','left:-7%;bottom:10%;width:70px'] },
+    { t:'photo', src:'assets/shot_17.14.34.webp', size:'hero',
+      sub:'<span class="nm">—</span> chi tiene i fili?', bg:'#39481f', stage:true,
+      d:['star','#e9b84a','left:-8%;bottom:8%;width:70px'] },
 
-    { t:'photo', src:'assets/IMG_3657.jpg', size:'land', y:-2, rot:-1,
-      sub:'«and it came with the rain — the surface remains unbroken.»', gap:1.15, bg:'#0e0e0e' },
+    { t:'photo', src:'assets/IMG_3657.jpg', size:'land',
+      sub:'«and it came with the rain — the surface remains unbroken.»', bg:'#0e0e0e' },
 
-    { t:'photo', src:'assets/tenda.webp', y:-2, rot:1,
-      sub:'«con la pioggia — la superficie resta intatta.»', gap:1.1, bg:'#5f5b8a' },
+    { t:'photo', src:'assets/tenda.webp',
+      sub:'«con la pioggia — la superficie resta intatta.»', bg:'#5f5b8a' },
 
-    { t:'photo', src:'assets/chiarabg.webp', y:-2, rot:-1.2,
-      sub:'«sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»', gap:1.1, bg:'#0e0e0e' },
+    { t:'photo', src:'assets/chiarabg.webp',
+      sub:'«sogno fino a pietrificarmi, per diventare terra — e infine germogliare.»', bg:'#0e0e0e' },
 
-    { t:'photo', src:'assets/sgab.webp', size:'small', y:6, rot:2,
-      sub:'«implorammo il cielo un miracolo.»', gap:1.05, bg:'#16236e' },
+    { t:'photo', src:'assets/sgab.webp', size:'small', pois:'#10205e',
+      sub:'«implorammo il cielo un miracolo.»', bg:'#16236e' },
 
-    { t:'video', v:4, sub:'«e venne con la pioggia.»', gap:1.15, bg:'#2c3a16' },
+    { t:'video', v:4, sub:'«e venne con la pioggia.»', bg:'#2c3a16' },
 
     { t:'word', lab:'contatti — cleanvillagesrl@gmail.com', text:'FIN', color:'#f5c400',
-      gap:0.8, bg:'#1733cc', mail:'cleanvillagesrl@gmail.com',
-      d:['underline','#f5c400','left:50%;bottom:14%;width:min(38vw,400px);transform:translateX(-50%)'] },
+      bg:'#1733cc', mail:'cleanvillagesrl@gmail.com', stage:true,
+      d:['underline','#f5c400','left:50%;bottom:12%;width:min(38vw,400px);transform:translateX(-50%)'] },
   ];
 
-  const stage = document.getElementById('stage');
-  const track = document.getElementById('track');
-  const bg    = document.getElementById('bg');
-  const hint  = document.getElementById('hint');
-  const prog  = document.getElementById('prog');
+  /* path layout in 3D: varied x/y so the camera weaves up/down/left/right */
+  const PX=[0, 560,-520, 380,-300, 600,-560, 320,-460, 520,-360, 460];
+  const PY=[0,-280, 320,-200, 300,-340, 200, 300,-260, 240,-320, 200];
+  const SPACING=1050, FOCUS=420;     // depth between beats / camera distance to focus
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const smooth=(e0,e1,x)=>{ const t=clamp((x-e0)/(e1-e0),0,1); return t*t*(3-2*t); };
+
+  const stageW = document.getElementById('world');
+  const sceneEl= document.getElementById('scene');
+  const bgEl   = document.getElementById('bg');
+  const subEl  = document.getElementById('sub');
+  const prog   = document.getElementById('prog');
+  const hint   = document.getElementById('hint');
+  const curtL=document.getElementById('curtL'), curtR=document.getElementById('curtR'),
+        valance=document.getElementById('valance'), spot=document.getElementById('spot'),
+        foot=document.getElementById('foot'), floor=document.getElementById('floor');
   const focusEl=document.getElementById('focus'), focusFrame=document.getElementById('focusFrame'),
         focusMeta=document.getElementById('focusMeta'), focusClose=document.getElementById('focusClose');
 
   const isFile = location.protocol === 'file:';
   const embedSrc = id => { const s='https://www.youtube.com/embed/'+id+'?autoplay=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3'; return isFile?s:s+'&origin='+encodeURIComponent(location.origin); };
-
-  /* reliable YouTube cover: hqdefault always exists; upgrade to maxres if available */
   function setThumb(img,id){
     img.src='https://i.ytimg.com/vi/'+id+'/hqdefault.jpg';
-    const hi=new Image();
-    hi.onload=()=>{ if(hi.naturalWidth>=1000) img.src=hi.src; };
+    const hi=new Image(); hi.onload=()=>{ if(hi.naturalWidth>=1000) img.src=hi.src; };
     hi.src='https://i.ytimg.com/vi/'+id+'/maxresdefault.jpg';
   }
 
-  /* build beats */
+  /* build beats into the 3D world */
   const beats = [];
-  BEATS.forEach(b=>{
-    const el = document.createElement('div');
-    el.className = 'beat ' + (b.size?('photo '+b.size):'') ;
-    let inner = '';
-
-    if (b.t==='logo'){
-      el.classList.add('logo');
-      inner = `<img src="${b.src}" alt="Chiara Cucciardi"><div class="lab">${b.lab||''}</div>`;
-    }
+  BEATS.forEach((b,i)=>{
+    const el = document.createElement('div'); el.className='beat';
+    const x = PX[i%PX.length], y = PY[i%PY.length], z = -i*SPACING;
+    let body='';
+    if (b.t==='logo'){ body=`<div class="logo"><img src="${b.src}" alt="Chiara Cucciardi"><div class="lab">${b.lab||''}</div></div>`; }
     else if (b.t==='word'){
-      el.classList.add('word');
-      if(b.dark) el.style.color='#0e0e0e';
-      inner = (b.lab?`<div class="lab">${b.lab}</div>`:'')
-            + `<b style="color:${b.color||'#fff'}">${b.text}</b>`
-            + (b.mail?`<div class="lab" style="margin-top:18px"><a href="mailto:${b.mail}" style="color:inherit">${b.lab||''}</a></div>`:'');
-      if(b.mail) inner = `<b style="color:${b.color}">${b.text}</b>`
-            + `<div class="lab" style="margin-top:20px"><a href="mailto:${b.mail}" style="color:#fff">${b.lab}</a></div>`;
+      const lab = b.mail ? `<div class="lab" style="margin-top:20px"><a href="mailto:${b.mail}">${b.lab}</a></div>`
+                         : (b.lab?`<div class="lab">${b.lab}</div>`:'');
+      const word = `<b style="color:${b.color||'#fff'}">${b.text}</b>`;
+      body=`<div class="word"${b.dark?' style="color:#0e0e0e"':''}>${b.mail?word+lab:lab+word}</div>`;
     }
     else if (b.t==='photo'){
-      el.classList.add('photo');
-      inner = `<div class="ph ${b.sub?'cap':''}"><img src="${b.src}" alt="" onerror="this.style.opacity=.15">
-        ${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>`;
+      body=`<div class="ph">${b.pois?`<div class="poisplane" style="color:${b.pois}"></div>`:''}
+        <img src="${b.src}" alt="" onerror="this.style.opacity=.15"></div>`;
     }
-    else if (b.t==='video'){
-      const v=VIDEOS[b.v];
-      el.classList.add('video');
-      inner = `<div class="vframe ${b.sub?'cap':''}" data-vi="${b.v}">
-          <img alt=""><div class="vtag">${v.cat}</div><div class="vplay">&#9654;</div>
-          ${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>`;
+    else if (b.t==='video'){ const v=VIDEOS[b.v];
+      body=`<div class="vframe" data-vi="${b.v}"><img alt=""><div class="vtag">${v.cat}</div><div class="vplay">&#9654;</div></div>`;
     }
-
-    if (b.d) inner += `<div class="doodle" style="${b.d[2]}">${DO[b.d[0]](b.d[1])}</div>`;
-    el.innerHTML = inner;
-    el.style.setProperty('--rot', (b.rot||0));
-    stage.appendChild(el);
-    const vf = el.querySelector('.vframe'); if(vf){ setThumb(vf.querySelector('img'), VIDEOS[b.v].id); }
-    el.querySelectorAll('[data-vi]').forEach(x => x.addEventListener('click', () => { if(!dragMoved) openFocus(VIDEOS[+x.dataset.vi]); }));
-    beats.push({ ...b, el, cx:0, vis:false });
+    if (b.d) body += `<div class="doodle" style="${b.d[2]}">${DO[b.d[0]](b.d[1])}</div>`;
+    if (b.size) el.classList.add(b.size);
+    el.innerHTML = `<div class="inner">${body}</div>`;
+    stageW.appendChild(el);
+    const vf=el.querySelector('.vframe'); if(vf) setThumb(vf.querySelector('img'), VIDEOS[b.v].id);
+    el.querySelectorAll('[data-vi]').forEach(x=> x.addEventListener('click', ()=>{ if(!dragMoved) openFocus(VIDEOS[+x.dataset.vi]); }));
+    beats.push({ ...b, el, x, y, z, yaw:clamp(-x*0.006,-6,6), pitch:clamp(y*0.006,-5,5), vis:true });
   });
 
-  /* layout along the timeline */
-  function layout(){
-    const vw = window.innerWidth;
-    let cur = vw*0.5, last = cur;
-    beats.forEach(b=>{ b.cx = cur; b.el.style.left = cur+'px'; last = cur; cur += (b.gap||0.95)*vw; });
-    stage.style.width = (last + vw*0.5) + 'px';
-  }
-
-  /* hex color helpers for the scene wash */
+  const N = beats.length;
   const hex = h => { h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; };
   const COL = BEATS.map(b=>hex(b.bg||'#0e0e0e'));
-  const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
-  function washAt(center){
-    // find segment by cx
-    let i=0; while(i<beats.length-1 && center>beats[i+1].cx) i++;
-    const a=beats[i], b=beats[Math.min(i+1,beats.length-1)];
-    const span=Math.max(1,b.cx-a.cx), t=Math.max(0,Math.min(1,(center-a.cx)/span));
-    const ca=COL[i], cb=COL[Math.min(i+1,beats.length-1)];
-    return `rgb(${lerp(ca[0],cb[0],t)},${lerp(ca[1],cb[1],t)},${lerp(ca[2],cb[2],t)})`;
+  const STAGE = beats.map(b=>!!b.stage);
+
+  /* ===== virtual scroll = the guided camera ===== */
+  let STEP = window.innerWidth;
+  let maxS = (N-1)*STEP;
+  let cur=0, targetS=0, raf=null, curSub=-1, subT=null;
+  let dragMoved=false;
+
+  function kick(){ if(!raf) raf=requestAnimationFrame(frame); }
+  function frame(){
+    cur += (targetS-cur)*0.12;
+    if(Math.abs(targetS-cur)<0.4) cur=targetS;
+    render();
+    raf = (cur!==targetS) ? requestAnimationFrame(frame) : null;
   }
 
-  const smooth=(e0,e1,x)=>{ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); };
+  function rgbLerp(i,j,t){ const a=COL[i],b=COL[j]; return `rgb(${Math.round(lerp(a[0],b[0],t))},${Math.round(lerp(a[1],b[1],t))},${Math.round(lerp(a[2],b[2],t))})`; }
 
-  /* the journey render: per-beat fade / scale / parallax driven by scroll */
   function render(){
-    const vw=track.clientWidth, sl=track.scrollLeft, center=sl+vw/2;
-    bg.style.backgroundColor = washAt(center);
-    const ms = track.scrollWidth - vw;
-    prog.style.width = (ms>0? sl/ms*100 : 0) + '%';
-    if(sl>40) hint.classList.add('gone');
+    const f = clamp(cur/STEP, 0, N-1);
+    const k = Math.floor(f), t = f-k, k1=Math.min(k+1,N-1);
 
-    for(const b of beats){
-      const n = (b.cx - center)/vw;               // -1 entering from left .. +1 exiting right
-      const an = Math.abs(n);
-      if(an>1.05){ if(b.vis){ b.el.classList.add('hidden'); b.el.classList.remove('live'); b.vis=false; } continue; }
-      if(!b.vis){ b.el.classList.remove('hidden'); b.vis=true; }
-      const a = 1 - smooth(0.32, 0.92, an);       // opacity
-      const sc = 0.9 + 0.1*a;                      // depth scale
-      const dx = n * 70;                           // parallax swoosh
-      const dy = (b.y||0) * (window.innerHeight/100) + n*22; // vertical drift
-      const rot = (parseFloat(b.el.style.getPropertyValue('--rot'))||0) * (1 - a*0.4);
-      b.el.style.opacity = a.toFixed(3);
-      b.el.style.transform = `translate(-50%,-50%) translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sc.toFixed(3)}) rotate(${rot.toFixed(2)}deg)`;
-      if(an<0.4) b.el.classList.add('live'); else b.el.classList.remove('live');
+    /* scene color wash */
+    bgEl.style.backgroundColor = rgbLerp(k,k1,t);
+
+    /* camera pose: center focus + small guided rotation */
+    const camX = lerp(beats[k].x, beats[k1].x, t);
+    const camY = lerp(beats[k].y, beats[k1].y, t);
+    const yaw  = lerp(beats[k].yaw, beats[k1].yaw, t);
+    const pitch= lerp(beats[k].pitch, beats[k1].pitch, t);
+    const camZ = f*SPACING - FOCUS;
+    stageW.style.transform =
+      `rotateX(${pitch.toFixed(2)}deg) rotateY(${yaw.toFixed(2)}deg) translate3d(${(-camX).toFixed(1)}px, ${(-camY).toFixed(1)}px, ${camZ.toFixed(1)}px)`;
+
+    /* per-beat opacity / culling / interactivity */
+    for(let i=0;i<N;i++){ const b=beats[i], delta=i-f, ad=Math.abs(delta);
+      if(ad>6){ if(b.vis){ b.el.style.display='none'; b.vis=false; b.el.classList.remove('live'); } continue; }
+      if(!b.vis){ b.el.style.display=''; b.vis=true; }
+      let op;
+      if(delta<0) op = clamp((delta+0.5)/0.5, 0, 1);          // fade as it passes the camera
+      else op = delta<=2 ? 1 : Math.max(0, 1-(delta-2)/3.2);  // distant previews fade softly
+      b.el.style.opacity = op.toFixed(3);
+      b.el.style.pointerEvents = ad<0.5 ? 'auto' : 'none';
+      if(ad<0.4) b.el.classList.add('live'); else b.el.classList.remove('live');
     }
+
+    /* subtitle (fixed, bottom) follows the focused beat */
+    const fi = Math.round(f);
+    if(fi!==curSub){ curSub=fi;
+      subEl.classList.remove('show'); clearTimeout(subT);
+      subT=setTimeout(()=>{ const s=BEATS[fi].sub; if(s){ subEl.innerHTML=s; subEl.classList.add('show'); } }, 170);
+    }
+
+    /* progress + hint */
+    prog.style.width = (maxS>0? cur/maxS*100 : 0)+'%';
+    if(cur>40) hint.classList.add('gone');
+
+    /* ===== THEATRE ===== */
+    // curtains: closed at the very start and very end, open in between
+    const coverIn  = 1 - smooth(0.06, 0.6, f);          // 1 → 0 over first beats
+    const coverOut = smooth(N-1.7, N-1.05, f);           // 0 → 1 near the finale
+    const cover = Math.max(coverIn, coverOut);
+    curtL.style.transform = `translateX(${(-100*(1-cover)).toFixed(1)}%)`;
+    curtR.style.transform = `translateX(${( 100*(1-cover)).toFixed(1)}%)`;
+    // stage amount = proximity to a "stage" beat
+    let stageAmt=0;
+    for(let i=0;i<N;i++){ if(STAGE[i]) stageAmt=Math.max(stageAmt, 1-clamp(Math.abs(i-f)/0.85,0,1)); }
+    valance.classList.toggle('on', stageAmt>0.15 || cover>0.2);
+    spot.style.opacity  = (stageAmt*0.9).toFixed(3);
+    foot.style.opacity  = (stageAmt).toFixed(3);
+    floor.style.opacity = (stageAmt*0.85).toFixed(3);
   }
+
+  /* ===== input ===== */
+  function addS(d){ targetS = clamp(targetS + d, 0, maxS); kick(); }
+  window.addEventListener('wheel', e=>{ if(focusOpen()) return; e.preventDefault();
+    addS((Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX) * 1.15); }, { passive:false });
+  document.addEventListener('keydown', e=>{ if(focusOpen()) return;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') addS(STEP*0.85);
+    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   addS(-STEP*0.85); });
+
+  /* drag / swipe */
+  let down=false, px=0, baseS=0;
+  function pdown(x){ down=true; dragMoved=false; px=x; baseS=targetS; document.body.classList.add('dragging'); if(raf){cancelAnimationFrame(raf);raf=null;} }
+  function pmove(x){ if(!down) return; const dx=x-px; if(Math.abs(dx)>4) dragMoved=true; targetS=clamp(baseS-dx*1.6,0,maxS); cur=targetS; render(); }
+  function pup(){ if(down){ down=false; document.body.classList.remove('dragging'); setTimeout(()=>dragMoved=false,30); } }
+  sceneEl.addEventListener('pointerdown', e=>{ if(e.pointerType!=='touch') pdown(e.clientX); });
+  window.addEventListener('pointermove', e=>{ if(e.pointerType!=='touch') pmove(e.clientX); });
+  window.addEventListener('pointerup', pup);
+  sceneEl.addEventListener('touchstart', e=>{ pdown(e.touches[0].clientX); }, {passive:true});
+  sceneEl.addEventListener('touchmove', e=>{ pmove(e.touches[0].clientX); }, {passive:true});
+  sceneEl.addEventListener('touchend', pup);
 
   /* ===== focus player ===== */
   const focusOpen = () => focusEl.classList.contains('on');
@@ -365,39 +449,8 @@
   focusEl.addEventListener('click', e=>{ if(e.target===focusEl) closeFocus(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeFocus(); });
 
-  /* ===== smooth linear scroll (the camera) ===== */
-  const maxScroll = () => track.scrollWidth - track.clientWidth;
-  let target = 0, raf = null;
-  function animate(){
-    const cur=track.scrollLeft, d=target-cur;
-    if(Math.abs(d)<0.5){ track.scrollLeft=target; raf=null; return; }
-    track.scrollLeft = cur + d*0.16; raf=requestAnimationFrame(animate);
-  }
-  function glide(by){
-    target = Math.max(0, Math.min(maxScroll(), (raf?target:track.scrollLeft)+by));
-    if(!raf) raf=requestAnimationFrame(animate);
-  }
-  track.addEventListener('wheel', e=>{
-    if(focusOpen()) return;
-    e.preventDefault();
-    glide((Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX) * 1.1);
-  }, { passive:false });
-  document.addEventListener('keydown', e=>{
-    if(focusOpen()) return;
-    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') glide(track.clientWidth*0.8);
-    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   glide(-track.clientWidth*0.8);
-  });
-
-  track.addEventListener('scroll', render, { passive:true });
-
-  /* drag to scroll */
-  let down=false, sx=0, sl0=0, dragMoved=false;
-  track.addEventListener('pointerdown', e=>{ if(e.pointerType!=='touch'){ down=true; dragMoved=false; sx=e.clientX; sl0=track.scrollLeft; if(raf){cancelAnimationFrame(raf);raf=null;} } });
-  track.addEventListener('pointermove', e=>{ if(!down) return; if(Math.abs(e.clientX-sx)>4) dragMoved=true; track.scrollLeft=sl0-(e.clientX-sx); target=track.scrollLeft; });
-  window.addEventListener('pointerup', ()=>{ if(down){ down=false; setTimeout(()=>dragMoved=false,30); } });
-
-  window.addEventListener('resize', ()=>{ layout(); render(); });
-  layout(); render();
+  window.addEventListener('resize', ()=>{ STEP=window.innerWidth; maxS=(N-1)*STEP; targetS=clamp(targetS,0,maxS); cur=clamp(cur,0,maxS); render(); });
+  render();
 </script>
 </body>
 </html>
