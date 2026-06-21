@@ -129,16 +129,18 @@
 
   /* ===== HERO (cover) ===== */
   .hero{grid-template-columns:1fr;}
-  .hero .pic{position:relative;z-index:2;}
+  .hero .pic{position:relative;z-index:2;display:inline-block;}
   .hero .pic img{display:block;max-height:72vh;max-width:72vw;width:auto;
     box-shadow:0 40px 90px rgba(0,0,0,.55);}
+  /* eta': etichetta verticale, grande e leggibile, attaccata al lato destro della foto */
+  .hero .pic .age{position:absolute;left:100%;top:0;height:100%;margin-left:clamp(8px,1.1vw,18px);
+    display:flex;align-items:center;writing-mode:vertical-rl;text-orientation:mixed;
+    font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;
+    font-size:clamp(30px,3.6vw,58px);line-height:1;color:#241410;}
   .hero .sig{position:absolute;z-index:3;left:5vw;bottom:8vh;font-family:'Cedarville Cursive',cursive;font-weight:400;
     color:#2a1714;font-size:clamp(54px,9.4vw,138px);line-height:1.02;transform:rotate(-2deg);
     text-shadow:0 3px 14px rgba(0,0,0,.14);}
   .hero .sig em{display:block;font-style:normal;color:#c0392b;font-size:1.0em;margin-top:-.04em;margin-left:.3em;}
-  .hero .sig .age{display:block;font-family:'Cedarville Cursive',cursive;font-size:.26em;color:#2a1714;
-    margin-top:.5em;margin-left:.4em;transform:rotate(-1deg);text-shadow:none;opacity:.85;
-    text-decoration:underline wavy #c0392b .04em;text-underline-offset:.22em;}
   .hero .role{position:absolute;z-index:3;right:6vw;top:16vh;text-align:right;font-family:'Space Mono',monospace;
     letter-spacing:.3em;text-transform:uppercase;font-size:clamp(11px,1.4vw,15px);line-height:2;}
   .hero .role b{color:var(--red);}
@@ -244,11 +246,11 @@
     .word b{font-size:clamp(46px,15vw,92px);}
     .hero{padding:0 6vw;justify-content:flex-start;}
     .hero .pic{margin-top:19vh;}
-    .hero .pic img{max-height:62vh;max-width:92vw;}
+    .hero .pic img{max-height:60vh;max-width:78vw;}
+    .hero .pic .age{font-size:clamp(26px,7vw,44px);margin-left:8px;letter-spacing:.04em;}
     .hero .sig{top:8vh;bottom:auto;left:7vw;right:6vw;font-size:clamp(40px,12vw,84px);line-height:1.06;
       transform:rotate(-2deg);text-shadow:0 2px 12px rgba(0,0,0,.3);}
     .hero .sig em{margin-left:.2em;}
-    .hero .sig .age{font-size:.3em;margin-top:.4em;}
     .hero .role{display:none;}
     .sec.contact{justify-content:center;}
     .chead{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);margin:0;z-index:0;
@@ -331,41 +333,41 @@
             'assets/volti/web/IMG_2062.webp','assets/volti/web/IMG_1733.webp','assets/volti/web/IMG_2061.webp','assets/volti/web/IMG_1738.webp'] },
 
     { t:'photo', nav:'Chi sono?', main:true, photo:'assets/IMG_7803.webp', bg:'#6d6a3a',
-      sub:'<span class="nm">—</span> chi sono io?', tag:['chi sono?','top:10%;left:8%'],
+      sub:'Chi sono io?', tag:['chi sono?','top:10%;left:8%'],
       d:[['arrow','#f5c400','right:14%;bottom:16%;width:90px']] },
 
     { t:'video', nav:'About me', main:true, v:0, bg:'#0e0e0e', lang:'about me', film:'ABOUT ME',
-      ghost:['ABOUT ME','top:8%;left:3%'], sub:'«guarda — e dimmi cosa vedi.»' },
+      ghost:['ABOUT ME','top:8%;left:3%'], sub:'Sbircia. Poi dimmi cosa vedi.' },
 
     { t:'word', nav:'Une femme', lab:'una donna è una donna', text:'UNE FEMME', color:'#e2231a', bg:'#f3efe4', dark:true },
 
     { t:'photo', nav:'Cinéma', photo:'assets/sgab.webp', bg:'#3a4a4a',
-      sub:'«come in un film di Godard — una donna, e basta.»', tag:['collage · une femme','top:10%;right:8%'] },
+      sub:'Come in un film di Godard - una prostituta di sentimenti.', tag:['collage · une femme','top:10%;right:8%'] },
 
     { t:'video', nav:'Le scene', main:true, v:2, bg:'#0e0e0e', lang:'scena in italiano', film:'COSA SARÀ',
-      ghost:['COSA SARÀ','bottom:7%;right:3%'], sub:'«e cosa sarà di noi, domani?»' },
+      ghost:['COSA SARÀ','bottom:7%;right:3%'], sub:'Dove inizio io e finisce l’aria intorno.' },
 
     { t:'mosaic', nav:'Mosaïque', photo:'assets/IMG_7800.webp', ratio:0.68, cols:5, rows:7, bg:'#b5160f',
-      sub:'<span class="nm">—</span> niente. <span class="nm">—</span> no!', tag:['dialogo · mosaïque','top:9%;left:8%'] },
+      sub:'Quante parole!', tag:['dialogo · mosaïque','top:9%;left:8%'] },
 
     { t:'video', nav:'An education', v:1, bg:'#101418', lang:'scena in italiano', film:'An education',
-      ghost:['EDUCATION','top:8%;right:3%'], sub:'«mi stavo solo divertendo.»' },
+      ghost:['EDUCATION','top:8%;right:3%'], sub:'Mi stavo solo divertendo.' },
 
     { t:'photo', nav:'Stelle', photo:'assets/IMG_7801.webp', bg:'#1733cc',
-      sub:'«sono una pietra con il sogno di un battito.»',
+      sub:'C’è qualcosa di terribile nella realtà, e io non so cos’è.',
       d:[['star','#f5c400','right:14%;top:12%;width:80px']] },
 
     { t:'video', nav:'Cruel intentions', v:3, bg:'#0e0e0e', lang:'scena in inglese', film:'Cruel intentions',
-      ghost:['CRUEL','top:8%;left:3%'], sub:'«you can’t touch me — I’m made of glass.»' },
+      ghost:['CRUEL','top:8%;left:3%'], sub:'All you need for a movie is a girl and a gun.' },
 
     { t:'quad', nav:'Couleurs', photo:'assets/IMG_7797.webp', ratio:0.75, bg:'#15171a',
-      sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»', tag:['en technicolor','top:9%;right:8%'] },
+      sub:'Caro Dio, fammi diventare un uccello, così posso volare lontano, lontano da qui.', tag:['en technicolor','top:9%;right:8%'] },
 
     { t:'video', nav:'In napoletano', v:4, bg:'#1a1410', lang:'scena in napoletano', film:'',
-      ghost:['NAPOLI','bottom:7%;left:3%'], sub:'«’o ssaje, ’a vita è na cosa sola.»' },
+      ghost:['NAPOLI','bottom:7%;left:3%'], sub:'Datece ’o tiempo d’arrivà,<br>pecché venimmo d’o Sud.' },
 
     { t:'photo', nav:'Poesie', main:true, photo:'assets/IMG_7792.webp', land:true, bg:'#5f5b8a',
-      sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»', tag:['collage · poesia','top:11%;left:7%'] },
+      sub:'Non smettete mai di ballare.', tag:['collage · poesia','top:11%;left:7%'] },
 
     { t:'end', nav:'Contatti', main:true, mail:'chiaracucciardi@gmail.com', ig:'chiaracucciardj', bg:'#1733cc' },
   ];
@@ -425,8 +427,8 @@
 
     if(s.t==='hero'){
       inner=`<div class="hero" style="display:contents">
-        <div class="pic reveal"><img src="${s.photo}" class="kb" alt="Chiara Cucciardi"></div>
-        <div class="sig reveal" style="--d:.15s">${s.name}<em>${s.name2}</em>${s.age?`<span class="age">${s.age}</span>`:''}</div>
+        <div class="pic reveal"><img src="${s.photo}" class="kb" alt="Chiara Cucciardi">${s.age?`<span class="age">${s.age}</span>`:''}</div>
+        <div class="sig reveal" style="--d:.15s">${s.name}<em>${s.name2}</em></div>
         <div class="role reveal" style="--d:.28s">attrice<br><b>·</b><br>roma</div></div>`;
     }
     else if(s.t==='word'){
