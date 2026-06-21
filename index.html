@@ -8,7 +8,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Oswald:wght@500;600;700&family=Shantell+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Cedarville+Cursive&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
@@ -131,13 +131,13 @@
   .hero .pic{position:relative;z-index:2;}
   .hero .pic img{display:block;max-height:72vh;max-width:72vw;width:auto;
     box-shadow:0 40px 90px rgba(0,0,0,.55);}
-  .hero .sig{position:absolute;z-index:3;left:5vw;bottom:8vh;font-family:'Shantell Sans',cursive;font-weight:700;
-    color:#2a1714;font-size:clamp(58px,10vw,148px);line-height:.86;transform:rotate(-3deg);
-    text-shadow:0 3px 14px rgba(0,0,0,.18);}
-  .hero .sig em{display:block;font-style:normal;color:#c0392b;font-size:1.02em;margin-top:-.1em;margin-left:.4em;}
-  .hero .sig .age{display:inline-block;font-family:'Shantell Sans',cursive;font-weight:600;font-size:.26em;
-    color:#2a1714;background:#fff;padding:.12em .55em;border-radius:40px;transform:rotate(4deg);
-    margin-top:.32em;box-shadow:0 5px 14px rgba(0,0,0,.16);text-shadow:none;}
+  .hero .sig{position:absolute;z-index:3;left:5vw;bottom:8vh;font-family:'Cedarville Cursive',cursive;font-weight:400;
+    color:#2a1714;font-size:clamp(54px,9.4vw,138px);line-height:1.02;transform:rotate(-2deg);
+    text-shadow:0 3px 14px rgba(0,0,0,.14);}
+  .hero .sig em{display:block;font-style:normal;color:#c0392b;font-size:1.0em;margin-top:-.04em;margin-left:.3em;}
+  .hero .sig .age{display:block;font-family:'Cedarville Cursive',cursive;font-size:.26em;color:#2a1714;
+    margin-top:.5em;margin-left:.4em;transform:rotate(-1deg);text-shadow:none;opacity:.85;
+    text-decoration:underline wavy #c0392b .04em;text-underline-offset:.22em;}
   .hero .role{position:absolute;z-index:3;right:6vw;top:16vh;text-align:right;font-family:'Space Mono',monospace;
     letter-spacing:.3em;text-transform:uppercase;font-size:clamp(11px,1.4vw,15px);line-height:2;}
   .hero .role b{color:var(--red);}
@@ -145,7 +145,7 @@
   /* end */
   .end{text-align:center;}
   .end b{font-family:'Anton',sans-serif;font-size:clamp(78px,20vw,240px);line-height:.8;color:var(--yellow);display:block;}
-  .end .sig{font-family:'Shantell Sans',cursive;font-weight:700;font-size:clamp(38px,6.5vw,76px);margin:10px 0 18px;}
+  .end .sig{font-family:'Cedarville Cursive',cursive;font-weight:400;font-size:clamp(34px,6vw,72px);margin:10px 0 22px;}
   .end .em{font-family:'Space Mono',monospace;letter-spacing:.22em;text-transform:uppercase;font-size:clamp(11px,1.4vw,15px);line-height:2;}
   .end .em a{color:var(--bone);}
   .end .em .sep{opacity:.4;margin:0 10px;}
@@ -299,12 +299,12 @@
 
   /* ===== SECTIONS — il racconto (riordina / aggiungi) ===== */
   const SECTIONS = [
-    { t:'hero', nav:'Copertina', photo:'assets/shot_17.13.40.webp', name:'Chiara', name2:'Cucciardi', age:'19 anni',
+    { t:'hero', nav:'Copertina', photo:'assets/shot_17.13.40.webp', name:'CHiARa', name2:'CUCCiarDi', age:'19 anni',
       bg:'#edc0a0', stripes:['#e2231a','#f5c400','#1733cc','#39481f','#f3efe4','#0e0e0e'] },
 
     { t:'contact', nav:'I Volti', title:'I VOLTI', bg:'#141414', cap:'otto modi per esserci',
-      srcs:['assets/volti/IMG_1734.webp','assets/volti/IMG_2071.webp','assets/volti/IMG_1737.webp','assets/volti/IMG_2058.webp',
-            'assets/volti/IMG_2062.webp','assets/volti/IMG_1733.webp','assets/volti/IMG_2061.webp','assets/volti/IMG_1738.webp'] },
+      srcs:['assets/volti/web/IMG_1734.webp','assets/volti/web/IMG_2071.webp','assets/volti/web/IMG_1737.webp','assets/volti/web/IMG_2058.webp',
+            'assets/volti/web/IMG_2062.webp','assets/volti/web/IMG_1733.webp','assets/volti/web/IMG_2061.webp','assets/volti/web/IMG_1738.webp'] },
 
     { t:'photo', nav:'Chi sono?', photo:'assets/IMG_7803.webp', bg:'#6d6a3a',
       sub:'<span class="nm">—</span> chi sono io?', tag:['chi sono?','top:10%;left:8%'],
@@ -430,7 +430,7 @@
       inner=`${ghost}<canvas class="half reveal" data-full="${s.photo}" style="aspect-ratio:${s.ratio||1}"></canvas>${tag}`;
     }
     else if(s.t==='contact'){
-      const f=s.srcs.map(src=>`<div class="f" data-full="${src}"><img src="${src}" alt="" loading="lazy"></div>`).join('');
+      const f=s.srcs.map(src=>`<div class="f" data-full="${src}"><img src="${src}" alt="" loading="lazy" decoding="async"></div>`).join('');
       inner=`<div class="chead reveal"><span class="ct">${s.title||'provini'}</span><span class="cp">${s.cap||''}</span></div><div class="contact reveal" style="--d:.1s">${f}</div>`;
     }
     else if(s.t==='video'){ const v=VIDEOS[s.v];
@@ -439,7 +439,7 @@
     }
     else if(s.t==='end'){
       inner=`<div class="end"><b class="reveal">FIN</b>
-        <div class="sig reveal" style="--d:.1s">Chiara Cucciardi</div>
+        <div class="sig reveal" style="--d:.1s">CHiARa CUCCiarDi</div>
         ${doo(['underline','#f5c400','left:50%;top:60%;width:min(38vw,400px);transform:translateX(-50%)'])}
         <div class="em reveal" style="--d:.2s"><a href="mailto:${s.mail}">${s.mail}</a>${s.ig?`<span class="sep">·</span><a href="https://instagram.com/${s.ig}" target="_blank" rel="noopener">@${s.ig}</a>`:''}</div></div>`;
     }
