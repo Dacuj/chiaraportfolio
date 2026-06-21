@@ -52,15 +52,20 @@
   .sec.in .shot img.kb{transform:scale(1.06);}
   .land .shot img{max-height:60vh;max-width:90vw;}
 
-  /* ===== QUAD (Quadrophenia tri/quad colour) — statico, le 4 versioni vicine ===== */
-  .quad{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px;cursor:zoom-in;
-    width:auto;max-width:min(86vw,520px);margin:0 auto;}
-  .quad .c{position:relative;margin:0;}
-  .quad img{display:block;width:100%;height:auto;box-shadow:0 12px 30px rgba(0,0,0,.32);}
-  .quad .c1 img{filter:grayscale(1) sepia(1) saturate(7) hue-rotate(5deg) contrast(1.05);}    /* giallo */
-  .quad .c2 img{filter:grayscale(1) sepia(1) saturate(9) hue-rotate(-18deg) contrast(1.05);}  /* arancio */
-  .quad .c3 img{filter:grayscale(1) sepia(1) saturate(12) hue-rotate(-40deg) contrast(1.1);}  /* rosso */
-  .quad .c4 img{filter:none;}                                                                 /* naturale */
+  /* ===== QUAD — sovrapposizione dei layer colorati (separazione di stampa) ===== */
+  .quad{position:relative;cursor:zoom-in;width:min(76vw,470px);margin:0 auto;
+    box-shadow:0 30px 70px rgba(0,0,0,.5);}
+  .quad .c{position:absolute;inset:0;}
+  .quad .c img{width:100%;height:100%;object-fit:cover;display:block;}
+  .quad .c1,.quad .c2,.quad .c3{mix-blend-mode:screen;filter:blur(1.3px);}
+  .quad .c1{transform:translate(-3.2%,-2%);}   /* rosso */
+  .quad .c2{transform:translate(3%,1%);}        /* verde */
+  .quad .c3{transform:translate(-.4%,3.2%);}    /* blu   */
+  .quad .c4{transform:none;}                     /* naturale, a fuoco, sopra */
+  .quad .c1 img{filter:grayscale(1) brightness(1.4) sepia(1) saturate(8) hue-rotate(-32deg);}
+  .quad .c2 img{filter:grayscale(1) brightness(1.25) sepia(1) saturate(8) hue-rotate(70deg);}
+  .quad .c3 img{filter:grayscale(1) brightness(1.3) sepia(1) saturate(9) hue-rotate(175deg);}
+  .quad .c4 img{filter:contrast(1.04) saturate(1.06);}
 
   /* ===== MOSAIC (squares, some B/W some strange colours) ===== */
   .mosaic{display:grid;height:min(74vh,640px);width:auto;max-width:90vw;cursor:zoom-in;gap:2px;background:#000;}
@@ -137,9 +142,11 @@
   .end{text-align:center;}
   .end b{font-family:'Anton',sans-serif;font-size:clamp(78px,20vw,240px);line-height:.8;color:var(--yellow);display:block;}
   .end .sig{font-family:'Cedarville Cursive',cursive;font-weight:400;font-size:clamp(34px,6vw,72px);margin:10px 0 22px;}
-  .end .em{font-family:'Space Mono',monospace;letter-spacing:.22em;text-transform:uppercase;font-size:clamp(11px,1.4vw,15px);line-height:2;}
-  .end .em a{color:var(--bone);}
-  .end .em .sep{opacity:.4;margin:0 10px;}
+  .end .em{font-family:'Space Mono',monospace;letter-spacing:.2em;text-transform:uppercase;font-size:clamp(11px,1.4vw,15px);
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 24px;}
+  .end .em a{color:var(--bone);display:inline-flex;align-items:center;gap:8px;}
+  .end .em .iglink svg{width:1.3em;height:1.3em;}
+  .end .em .iglink:hover{color:var(--yellow);}
 
   /* doodles */
   .doodle{position:absolute;pointer-events:none;overflow:visible;z-index:6;}
@@ -228,7 +235,7 @@
 
   @media (max-width:760px){
     .shot img{max-height:60vh;max-width:88vw;}
-    .quad{max-width:82vw;gap:6px;}
+    .quad{width:84vw;}
     .word b{font-size:clamp(46px,15vw,92px);}
     .hero{padding:0 6vw;justify-content:flex-start;}
     .hero .pic{margin-top:19vh;}
@@ -245,6 +252,9 @@
     .chead .cp{opacity:.34;margin-top:6px;}
     .contact{position:relative;z-index:1;gap:5px;}
     #sub{font-size:clamp(15px,4.2vw,21px);bottom:8%;}
+    .end b{font-size:clamp(60px,24vw,118px);}
+    .end .sig{font-size:clamp(32px,9vw,56px);}
+    .end .em{flex-direction:column;gap:14px;letter-spacing:.14em;font-size:13px;}
     #brand{display:none;}
     #hint{display:none;}
     #focus .meta{display:none;}
@@ -343,7 +353,7 @@
     { t:'video', nav:'Cruel intentions', v:3, bg:'#0e0e0e', lang:'scena in inglese', film:'Cruel intentions',
       ghost:['CRUEL','top:8%;left:3%'], sub:'«you can’t touch me — I’m made of glass.»' },
 
-    { t:'quad', nav:'Couleurs', photo:'assets/IMG_7797.webp', ratio:0.75, bg:'#a83f54',
+    { t:'quad', nav:'Couleurs', photo:'assets/IMG_7797.webp', ratio:0.75, bg:'#15171a',
       sub:'«conosco la lingua del muschio: anche le pietre saranno libere.»', tag:['en technicolor','top:9%;right:8%'] },
 
     { t:'video', nav:'In napoletano', v:4, bg:'#1a1410', lang:'scena in napoletano', film:'',
@@ -352,7 +362,7 @@
     { t:'photo', nav:'Poesie', main:true, photo:'assets/IMG_7792.webp', land:true, bg:'#5f5b8a',
       sub:'«o frenetiche notti! se fossi accanto a te, sarebbero la nostra estasi.»', tag:['collage · poesia','top:11%;left:7%'] },
 
-    { t:'end', nav:'Contatti', main:true, mail:'chiaracucciardi@gmail.com', ig:'chiaracucciardi', bg:'#1733cc' },
+    { t:'end', nav:'Contatti', main:true, mail:'chiaracucciardi@gmail.com', ig:'chiaracucciardj', bg:'#1733cc' },
   ];
 
   const pages=document.getElementById('pages'), bgEl=document.getElementById('bg'),
@@ -434,7 +444,7 @@
     }
     else if(s.t==='quad'){
       const c=n=>`<div class="c c${n}"><img src="${s.photo}" alt=""></div>`;
-      inner=`${ghost}<div class="quad reveal" data-full="${s.photo}">${c(1)}${c(2)}${c(3)}${c(4)}</div>${tag}`;
+      inner=`${ghost}<div class="quad reveal" data-full="${s.photo}" style="aspect-ratio:${s.ratio||0.75}">${c(1)}${c(2)}${c(3)}${c(4)}</div>${tag}`;
     }
     else if(s.t==='halftone'){
       inner=`${ghost}<canvas class="half reveal" data-full="${s.photo}" style="aspect-ratio:${s.ratio||1}"></canvas>${tag}`;
@@ -448,10 +458,11 @@
       inner=`${ghost}${head}<div class="vframe reveal" style="--d:.12s" data-vi="${s.v}"><img alt=""><div class="vtag">${s.lang||v.cat}</div><div class="vplay">&#9654;</div></div>${tag}`;
     }
     else if(s.t==='end'){
+      const IG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.4"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>`;
       inner=`<div class="end"><b class="reveal">FIN</b>
         <div class="sig reveal" style="--d:.1s">CHiARa CUCCiarDi</div>
         ${doo(['underline','#f5c400','left:50%;top:60%;width:min(38vw,400px);transform:translateX(-50%)'])}
-        <div class="em reveal" style="--d:.2s"><a href="mailto:${s.mail}">${s.mail}</a>${s.ig?`<span class="sep">·</span><a href="https://instagram.com/${s.ig}" target="_blank" rel="noopener">@${s.ig}</a>`:''}</div></div>`;
+        <div class="em reveal" style="--d:.2s"><a href="mailto:${s.mail}">${s.mail}</a>${s.ig?`<a class="iglink" href="https://instagram.com/${s.ig}" target="_blank" rel="noopener">${IG}<span>@${s.ig}</span></a>`:''}</div></div>`;
     }
 
     sec.innerHTML = wipe(i, s.stripes) + inner;
@@ -470,7 +481,7 @@
     if(s.main){
       const btn=document.createElement('button'); btn.dataset.i=i;
       btn.innerHTML=`<span class="lab">${s.nav||s.t}</span><span class="dot"></span>`;
-      btn.addEventListener('click',()=>smoothTo(secs[i].el.offsetTop));
+      btn.addEventListener('click',()=>{ secs[i].el.classList.add('in'); smoothTo(secs[i].el.offsetTop); });
       indexEl.appendChild(btn);
       navBtns.push({i,btn});
     }
@@ -486,7 +497,7 @@
   const io=new IntersectionObserver(entries=>{
     entries.forEach(e=>{
       const i=secs.findIndex(s=>s.el===e.target);
-      if(e.isIntersecting && e.intersectionRatio>0.18) e.target.classList.add('in'); // reveal una sola volta
+      if(e.isIntersecting) e.target.classList.add('in'); // reveal appena entra (una sola volta)
       if(e.isIntersecting && e.intersectionRatio>0.5) setActive(i);
     });
   }, { root:pages, threshold:[0,0.18,0.5,0.8] });
@@ -522,13 +533,14 @@
   /* ===== smooth (eased) scrolling — fluido, non meccanico ===== */
   let sTarget=null, sRaf=null;
   function sStep(){ const cur=pages.scrollTop, d=sTarget-cur;
-    if(Math.abs(d)<0.5){ pages.scrollTop=sTarget; sRaf=null; sTarget=null; return; }
-    pages.scrollTop=cur+d*0.135; sRaf=requestAnimationFrame(sStep); }
+    if(Math.abs(d)<0.5){ pages.scrollTop=sTarget; sRaf=null; sTarget=null; revealNet(); return; }
+    pages.scrollTop=cur+d*0.135; revealNet(); sRaf=requestAnimationFrame(sStep); }
   function smoothTo(v){ sTarget=Math.max(0,Math.min(pages.scrollHeight-pages.clientHeight, v));
     if(!sRaf) sRaf=requestAnimationFrame(sStep); }
   function cancelSmooth(){ if(sRaf){ cancelAnimationFrame(sRaf); sRaf=null; } sTarget=null; }
   /* se l'utente tocca/trascina, l'animazione si ferma subito (niente blocco dopo il menu) */
   pages.addEventListener('touchstart', cancelSmooth, {passive:true});
+  pages.addEventListener('touchmove', revealNet, {passive:true});
   pages.addEventListener('pointerdown', e=>{ if(e.pointerType==='touch') cancelSmooth(); }, {passive:true});
   pages.addEventListener('wheel',e=>{ if(modalOpen()) return; e.preventDefault();
     const base=(sTarget==null?pages.scrollTop:sTarget);
