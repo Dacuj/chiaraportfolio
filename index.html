@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chiara Cucciardi</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23e2231a'/%3E%3Ctext x='51' y='54' font-family='Georgia,serif' font-weight='700' font-size='76' fill='%23f3efe4' text-anchor='middle' dominant-baseline='central'%3EC%3C/text%3E%3C/svg%3E">
 <script>document.documentElement.className+=' js';</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -481,7 +482,7 @@
     if(s.main){
       const btn=document.createElement('button'); btn.dataset.i=i;
       btn.innerHTML=`<span class="lab">${s.nav||s.t}</span><span class="dot"></span>`;
-      btn.addEventListener('click',()=>{ secs[i].el.classList.add('in'); smoothTo(secs[i].el.offsetTop); });
+      btn.addEventListener('click',()=>{ reveal(secs[i].el); smoothTo(secs[i].el.offsetTop); });
       indexEl.appendChild(btn);
       navBtns.push({i,btn});
     }
@@ -494,10 +495,17 @@
 
   /* reveal (ONCE — niente ri-copertura quando scorri veloce) + active section */
   let active=-1;
+  /* solleva le strisce in modo GARANTITO: imposto la transform inline (vince su tutto)
+     leggendo la direzione dalla classe del wipe — cosi' non possono mai restare bloccate */
+  function liftWipe(sec){ const w=sec.querySelector('.wipe'); if(!w||w._lifted) return; w._lifted=1;
+    const cl=w.classList, t = cl.contains('up')?'translateY(-102%)' : cl.contains('down')?'translateY(102%)'
+      : cl.contains('left')?'translateX(-102%)' : cl.contains('right')?'translateX(102%)' : 'translateY(-102%)';
+    w.querySelectorAll('i').forEach(s=>{ s.style.transform=t; }); }
+  function reveal(sec){ liftWipe(sec); if(!sec.classList.contains('in')) sec.classList.add('in'); }
   const io=new IntersectionObserver(entries=>{
     entries.forEach(e=>{
       const i=secs.findIndex(s=>s.el===e.target);
-      if(e.isIntersecting) e.target.classList.add('in'); // reveal appena entra (una sola volta)
+      if(e.isIntersecting) reveal(e.target); // reveal appena entra (una sola volta)
       if(e.isIntersecting && e.intersectionRatio>0.5) setActive(i);
     });
   }, { root:pages, threshold:[0,0.18,0.5,0.8] });
@@ -522,8 +530,8 @@
   /* rete di sicurezza: rivela ogni sezione appena entra (anche se l'IntersectionObserver
      non scatta su alcuni mobile) — cosi' le strisce non restano mai bloccate sopra */
   function revealNet(){ const vh=pages.clientHeight;
-    secs.forEach(o=>{ if(o.el.classList.contains('in')) return; const r=o.el.getBoundingClientRect();
-      if(r.top < vh*0.85 && r.bottom > vh*0.15) o.el.classList.add('in'); }); }
+    secs.forEach(o=>{ if(o.el._lift_done) return; const r=o.el.getBoundingClientRect();
+      if(r.top < vh*0.92 && r.bottom > vh*0.08){ o.el._lift_done=1; reveal(o.el); } }); }
 
   /* progress + hint + scrolly */
   pages.addEventListener('scroll',()=>{ const m=pages.scrollHeight-pages.clientHeight;
@@ -577,7 +585,7 @@
   /* curtains auto-open then remove */
   setTimeout(()=>curtains.classList.add('done'),2100);
 
-  secs[0].el.classList.add('in'); setActive(0); revealNet(); updateScrolly();
+  reveal(secs[0].el); secs[0].el._lift_done=1; setActive(0); revealNet(); updateScrolly();
 </script>
 </body>
 </html>
