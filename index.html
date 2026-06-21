@@ -233,9 +233,11 @@
     .quad img{height:min(48vh,84vw);}
     .quad .c{margin-left:-82%;}
     .word b{font-size:clamp(46px,15vw,92px);}
-    .hero{padding-top:0;}
-    .hero .pic img{max-height:52vh;max-width:88vw;}
-    .hero .sig{top:max(12vh,84px);bottom:auto;left:6vw;right:6vw;font-size:clamp(44px,13vw,80px);line-height:.84;}
+    .hero{padding:9vh 6vw 5vh;justify-content:flex-end;}
+    .hero .pic img{max-height:57vh;max-width:92vw;}
+    .hero .sig{top:8vh;bottom:auto;left:7vw;right:6vw;font-size:clamp(42px,12.5vw,86px);line-height:1.04;transform:rotate(-2deg);}
+    .hero .sig em{margin-left:.2em;}
+    .hero .sig .age{font-size:.3em;margin-top:.4em;}
     .hero .role{display:none;}
     .contact{gap:5px;}
     .chead .ct{font-size:clamp(24px,7vw,40px);}
@@ -444,8 +446,8 @@
         <div class="em reveal" style="--d:.2s"><a href="mailto:${s.mail}">${s.mail}</a>${s.ig?`<span class="sep">·</span><a href="https://instagram.com/${s.ig}" target="_blank" rel="noopener">@${s.ig}</a>`:''}</div></div>`;
     }
 
-    const scrolly = (s.t==='quad'||s.t==='contact');
-    if(scrolly){ sec.classList.add('scrolly'); sec.style.setProperty('--len', s.t==='quad'?'2.6':'2.0');
+    const scrolly = (s.t==='quad');
+    if(scrolly){ sec.classList.add('scrolly'); sec.style.setProperty('--len','2.6');
       sec.innerHTML = `<div class="sticky">${wipe(i,s.stripes)}${inner}</div>`;
     } else {
       sec.innerHTML = wipe(i, s.stripes) + inner;
@@ -458,11 +460,6 @@
           c.style.transform=`translate(-50%,-50%) translateX(${(off*70).toFixed(1)}vw) scale(${(1-Math.min(.12,Math.abs(off)*.12)).toFixed(3)})`;
           c.style.opacity=Math.max(0,Math.min(1,1-Math.abs(off))).toFixed(3);
           c.style.zIndex=String(30-Math.round(Math.abs(off)*10)); }); }});
-    }
-    if(s.t==='contact'){ const tiles=[...sec.querySelectorAll('.contact .f')];
-      const order=tiles.map((_,k)=>k).sort(()=>Math.random()-0.5);
-      scrollySecs.push({el:sec, apply:p=>{ const n=Math.round(p*Math.min(6,tiles.length));
-        order.forEach((ti,rank)=>tiles[ti].classList.toggle('lit', rank<n)); }});
     }
 
     const vf=sec.querySelector('.vframe'); if(vf) setThumb(vf.querySelector('img'),VIDEOS[s.v].id);
