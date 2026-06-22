@@ -126,12 +126,27 @@
     background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.45);}
   .cvframe iframe{width:100%;height:100%;border:0;display:block;pointer-events:none;}
   .cvframe .cvover{position:absolute;inset:0;cursor:pointer;display:block;}
+  .cvcard{display:none;}
   .cvbtns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
   .cvbtn{font-family:'Space Mono',monospace;letter-spacing:.16em;text-transform:uppercase;font-size:13px;
     color:#fff;background:var(--red);padding:14px 24px;text-decoration:none;border:2px solid var(--bone);transition:background .25s;}
   .cvbtn:hover{background:var(--blue);}
   .cvbtn.alt{background:transparent;}
   .cvbtn.alt:hover{background:var(--red);}
+  /* su mobile l'anteprima PDF nativa si zooma/rompe: la sostituiamo con una card pulita */
+  @media (max-width:760px){
+    .cvframe{aspect-ratio:auto;height:auto;width:92vw;max-width:92vw;background:transparent;box-shadow:none;}
+    .cvframe iframe,.cvframe .cvover{display:none;}
+    .cvcard{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;
+      text-decoration:none;color:#1a1a1a;background:var(--bone);padding:42px 24px;
+      border:1px solid rgba(0,0,0,.12);box-shadow:0 24px 60px rgba(0,0,0,.4);}
+    .cvcard .ic{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.18em;
+      background:var(--red);color:#fff;padding:9px 15px;font-size:14px;}
+    .cvcard .tt{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:30px;margin-top:6px;letter-spacing:.02em;}
+    .cvcard .ss{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.7;}
+    .cvcard .go{margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+      color:#fff;background:var(--ink);padding:12px 22px;}
+  }
 
   /* intertitle word */
   .word{text-align:center;}
@@ -345,7 +360,7 @@
     { t:'hero', nav:'Copertina', main:true, photo:'assets/shot_17.13.40.webp', name:'CHiARa', name2:'CUCCiarDi', age:'19 anni',
       bg:'#edc0a0', stripes:['#e2231a','#f5c400','#1733cc','#39481f','#f3efe4','#0e0e0e'] },
 
-    { t:'contact', nav:'Volti', main:true, title:'VOLTI', bg:'#141414', cap:'otto modi per esserci',
+    { t:'contact', nav:'Foto', main:true, title:'FOTO', bg:'#141414', cap:'otto modi per esserci',
       srcs:['assets/volti/web/IMG_1734.webp','assets/volti/web/IMG_2071.webp','assets/volti/web/IMG_1737.webp','assets/volti/web/IMG_2058.webp',
             'assets/volti/web/IMG_2062.webp','assets/volti/web/IMG_1733.webp','assets/volti/web/IMG_2061.webp','assets/volti/web/IMG_1738.webp'] },
 
@@ -460,7 +475,7 @@
     }
     else if(s.t==='cv'){
       inner=`${ghost}<div class="cvwrap reveal"><div class="cvhead">CURRICULUM</div>
-        <div class="cvframe"><iframe src="${s.pdf}#toolbar=0&view=FitH" title="Curriculum Chiara Cucciardi" loading="lazy"></iframe><a class="cvover" href="${s.pdf}" target="_blank" rel="noopener" aria-label="Apri il CV"></a></div>
+        <div class="cvframe"><iframe src="${s.pdf}#toolbar=0&view=FitH" title="Curriculum Chiara Cucciardi" loading="lazy"></iframe><a class="cvover" href="${s.pdf}" target="_blank" rel="noopener" aria-label="Apri il CV"></a><a class="cvcard" href="${s.pdf}" target="_blank" rel="noopener"><span class="ic">PDF</span><span class="tt">Curriculum Vit&aelig;</span><span class="ss">Chiara Cucciardi</span><span class="go">Apri il CV &#8599;</span></a></div>
         <div class="cvbtns"><a class="cvbtn" href="${s.pdf}" target="_blank" rel="noopener">Apri il CV &#8599;</a>
         <a class="cvbtn alt" href="${s.pdf}" download="CV-Chiara-Cucciardi.pdf">Scarica PDF &#8595;</a></div></div>${tag}`;
     }
