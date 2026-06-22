@@ -337,51 +337,33 @@
     underline:(c)=>`<svg class="doodle" viewBox="0 0 320 40" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><path pathLength="1" d="M6 22C70 10 150 30 230 16c36-6 70-8 86-2"/></svg>`,
   };
 
-  /* ===== SECTIONS — il racconto (riordina / aggiungi) ===== */
+  /* ===== SECTIONS — pulito ed essenziale: accesso rapido per gli scrutatori,
+     ma con identita' artistica (copertina, disegno, collage Godard).
+     Niente "reference" in basso (tranne "chi sono io"), niente disegni,
+     niente etichette/ghost: solo cio' che serve, ordinato e leggibile. ===== */
   const SECTIONS = [
     { t:'hero', nav:'Copertina', main:true, photo:'assets/shot_17.13.40.webp', name:'CHiARa', name2:'CUCCiarDi', age:'19 anni',
       bg:'#edc0a0', stripes:['#e2231a','#f5c400','#1733cc','#39481f','#f3efe4','#0e0e0e'] },
 
-    { t:'contact', nav:'Foto', main:true, title:'FOTO', bg:'#141414', cap:'otto modi per esserci',
+    { t:'contact', nav:'Foto', main:true, title:'FOTO', bg:'#141414',
       srcs:['assets/volti/web/IMG_1734.webp','assets/volti/web/IMG_2071.webp','assets/volti/web/IMG_1737.webp','assets/volti/web/IMG_2058.webp',
             'assets/volti/web/IMG_2062.webp','assets/volti/web/IMG_1733.webp','assets/volti/web/IMG_2061.webp','assets/volti/web/IMG_1738.webp'] },
 
-    { t:'photo', nav:'Chi sono?', main:true, photo:'assets/IMG_7803.webp', bg:'#6d6a3a',
-      sub:'Chi sono io?', tag:['chi sono?','top:10%;left:8%'],
-      d:[['arrow','#f5c400','right:14%;bottom:16%;width:90px']] },
+    { t:'photo', nav:'Chi sono?', main:true, photo:'assets/IMG_7803.webp', bg:'#6d6a3a', sub:'Chi sono io?' },
 
-    { t:'video', nav:'About me', main:true, v:0, bg:'#0e0e0e', lang:'about me', film:'ABOUT ME',
-      ghost:['ABOUT ME','top:8%;left:3%'], sub:'Sbircia. Poi dimmi cosa vedi.' },
+    { t:'photo', nav:'Cinéma', photo:'assets/godard.webp', land:true, bg:'#7a3b25' },
 
-    { t:'word', nav:'Une femme', lab:'una donna è una donna', text:'UNE FEMME', color:'#e2231a', bg:'#f3efe4', dark:true },
+    { t:'video', nav:'About me', main:true, v:0, bg:'#0e0e0e', lang:'about me', film:'' },
 
-    { t:'photo', nav:'Cinéma', photo:'assets/godard.webp', land:true, bg:'#7a3b25',
-      sub:'Come in un film di Godard - una prostituta di sentimenti.', tag:['collage · une femme','top:10%;right:8%'] },
+    { t:'video', nav:'Le scene', main:true, v:2, bg:'#0e0e0e', lang:'scena in italiano', film:'COSA SARÀ' },
 
-    { t:'video', nav:'Le scene', main:true, v:2, bg:'#0e0e0e', lang:'scena in italiano', film:'COSA SARÀ',
-      ghost:['COSA SARÀ','bottom:7%;right:3%'], sub:'Dove inizio io e finisce l’aria intorno.' },
+    { t:'video', nav:'An education', v:1, bg:'#101418', lang:'scena in italiano', film:'AN EDUCATION' },
 
-    { t:'mosaic', nav:'Mosaïque', photo:'assets/IMG_7800.webp', ratio:0.68, cols:5, rows:7, bg:'#b5160f',
-      sub:'Quante parole!', tag:['dialogo · mosaïque','top:9%;left:8%'] },
+    { t:'video', nav:'Cruel intentions', v:3, bg:'#0e0e0e', lang:'scena in inglese', film:'CRUEL INTENTIONS' },
 
-    { t:'video', nav:'An education', v:1, bg:'#101418', lang:'scena in italiano', film:'An education',
-      ghost:['EDUCATION','top:8%;right:3%'], sub:'Mi stavo solo divertendo.' },
+    { t:'video', nav:'In napoletano', v:4, bg:'#1a1410', lang:'scena in napoletano', film:'' },
 
-    { t:'photo', nav:'Stelle', photo:'assets/IMG_7801.webp', bg:'#1733cc',
-      sub:'C’è qualcosa di terribile nella realtà, e io non so cos’è.',
-      d:[['star','#f5c400','right:14%;top:12%;width:80px']] },
-
-    { t:'video', nav:'Cruel intentions', v:3, bg:'#0e0e0e', lang:'scena in inglese', film:'Cruel intentions',
-      ghost:['CRUEL','top:8%;left:3%'], sub:'All you need for a movie is a girl and a gun.' },
-
-    { t:'quad', nav:'Couleurs', photo:'assets/shot_17.14.34.webp', ratio:0.673, bg:'#15171a',
-      sub:'Caro Dio, fammi diventare un uccello, così posso volare lontano, lontano da qui.', tag:['en technicolor','top:9%;right:8%'] },
-
-    { t:'video', nav:'In napoletano', v:4, bg:'#1a1410', lang:'scena in napoletano', film:'',
-      ghost:['NAPOLI','bottom:7%;left:3%'], sub:'Datece ’o tiempo d’arrivà,<br>pecché venimmo d’o Sud.' },
-
-    { t:'cv', nav:'CV', main:true, pdf:'assets/CV-Chiara%20Cucciardi.pdf', bg:'#101418',
-      sub:'Curriculum vitæ', tag:['curriculum','top:10%;left:8%'] },
+    { t:'cv', nav:'CV', main:true, pdf:'assets/CV-Chiara%20Cucciardi.pdf', bg:'#101418' },
 
     { t:'end', nav:'Contatti', main:true, mail:'chiaracucciardi2006@gmail.com', ig:'chiaracucciardj', bg:'#1733cc' },
   ];
@@ -488,7 +470,6 @@
       const IG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.4"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>`;
       inner=`<div class="end"><b class="reveal">FIN</b>
         <div class="sig reveal" style="--d:.1s">CHiARa CUCCiarDi</div>
-        ${doo(['underline','#f5c400','left:50%;top:60%;width:min(38vw,400px);transform:translateX(-50%)'])}
         <div class="em reveal" style="--d:.2s"><a href="mailto:${s.mail}">${s.mail}</a>${s.ig?`<a class="iglink" href="https://instagram.com/${s.ig}" target="_blank" rel="noopener">${IG}<span>@${s.ig}</span></a>`:''}</div></div>`;
     }
 
