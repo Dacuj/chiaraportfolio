@@ -122,30 +122,21 @@
   /* ===== CV (curriculum PDF) ===== */
   .cvwrap{display:flex;flex-direction:column;align-items:center;gap:22px;width:min(720px,92vw);}
   .cvhead{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(30px,5.5vw,64px);letter-spacing:.03em;}
-  .cvframe{position:relative;aspect-ratio:1/1.414;height:min(64vh,calc(86vw*1.414));max-width:90vw;width:auto;
+  .cvframe{display:block;width:auto;max-width:min(720px,92vw);cursor:pointer;line-height:0;
     background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.45);}
-  .cvframe iframe{width:100%;height:100%;border:0;display:block;pointer-events:none;}
-  .cvframe .cvover{position:absolute;inset:0;cursor:pointer;display:block;}
-  .cvcard{display:none;}
+  .cvframe img{display:block;width:auto;height:auto;max-height:66vh;max-width:100%;}
+  .cvframe img+img{margin-top:6px;}
   .cvbtns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
   .cvbtn{font-family:'Space Mono',monospace;letter-spacing:.16em;text-transform:uppercase;font-size:13px;
     color:#fff;background:var(--red);padding:14px 24px;text-decoration:none;border:2px solid var(--bone);transition:background .25s;}
   .cvbtn:hover{background:var(--blue);}
   .cvbtn.alt{background:transparent;}
   .cvbtn.alt:hover{background:var(--red);}
-  /* su mobile l'anteprima PDF nativa si zooma/rompe: la sostituiamo con una card pulita */
+  /* su mobile mostriamo il CV a tutta larghezza, scorrevole */
   @media (max-width:760px){
-    .cvframe{aspect-ratio:auto;height:auto;width:92vw;max-width:92vw;background:transparent;box-shadow:none;}
-    .cvframe iframe,.cvframe .cvover{display:none;}
-    .cvcard{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;
-      text-decoration:none;color:#1a1a1a;background:var(--bone);padding:42px 24px;
-      border:1px solid rgba(0,0,0,.12);box-shadow:0 24px 60px rgba(0,0,0,.4);}
-    .cvcard .ic{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.18em;
-      background:var(--red);color:#fff;padding:9px 15px;font-size:14px;}
-    .cvcard .tt{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:30px;margin-top:6px;letter-spacing:.02em;}
-    .cvcard .ss{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.7;}
-    .cvcard .go{margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-      color:#fff;background:var(--ink);padding:12px 22px;}
+    .sec.cv{overflow:visible;padding-top:16vh;padding-bottom:12vh;}
+    .cvframe{max-width:94vw;}
+    .cvframe img{max-height:none;width:100%;}
   }
 
   /* intertitle word */
@@ -376,7 +367,7 @@
 
     { t:'video', nav:'In napoletano', v:4, bg:'#1a1410', lang:'scena in napoletano', film:'' },
 
-    { t:'cv', nav:'CV', main:true, pdf:'assets/CV-Chiara%20Cucciardi.pdf', bg:'#101418' },
+    { t:'cv', nav:'CV', main:true, pdf:'assets/CV-Chiara%20Cucciardi.pdf', imgs:['assets/cv/cv-1.webp'], bg:'#101418' },
 
     { t:'end', nav:'Contatti', main:true, mail:'chiaracucciardi2006@gmail.com', ig:'chiaracucciardj', bg:'#1733cc' },
   ];
@@ -474,8 +465,9 @@
       inner=`${ghost}${head}<div class="vframe reveal" style="--d:.12s" data-vi="${s.v}"><img alt=""><div class="vtag">${s.lang||v.cat}</div><div class="vplay">&#9654;</div></div>${tag}`;
     }
     else if(s.t==='cv'){
+      const imgs=(s.imgs||[]).map(src=>`<img src="${src}" alt="Curriculum Chiara Cucciardi" loading="lazy">`).join('');
       inner=`${ghost}<div class="cvwrap reveal"><div class="cvhead">CURRICULUM</div>
-        <div class="cvframe"><iframe src="${s.pdf}#toolbar=0&view=FitH" title="Curriculum Chiara Cucciardi" loading="lazy"></iframe><a class="cvover" href="${s.pdf}" target="_blank" rel="noopener" aria-label="Apri il CV"></a><a class="cvcard" href="${s.pdf}" target="_blank" rel="noopener"><span class="ic">PDF</span><span class="tt">Curriculum Vit&aelig;</span><span class="ss">Chiara Cucciardi</span><span class="go">Apri il CV &#8599;</span></a></div>
+        <a class="cvframe" href="${s.pdf}" target="_blank" rel="noopener" aria-label="Apri il CV">${imgs}</a>
         <div class="cvbtns"><a class="cvbtn" href="${s.pdf}" target="_blank" rel="noopener">Apri il CV &#8599;</a>
         <a class="cvbtn alt" href="${s.pdf}" download="CV-Chiara-Cucciardi.pdf">Scarica PDF &#8595;</a></div></div>${tag}`;
     }
