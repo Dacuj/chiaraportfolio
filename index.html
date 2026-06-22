@@ -259,6 +259,12 @@
   .navarrow.prev{left:max(12px,env(safe-area-inset-left));}
   .navarrow.next{right:max(12px,env(safe-area-inset-right));}
   @media (max-width:760px){ .navarrow{width:46px;height:46px;font-size:28px;background:rgba(0,0,0,.5);} }
+  .dlbtn{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));z-index:4;
+    display:inline-flex;align-items:center;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:#fff;background:var(--red);border:2px solid var(--bone);padding:11px 16px;
+    text-decoration:none;cursor:pointer;transition:background .25s;}
+  .dlbtn:hover{background:var(--blue);}
+  @media (max-width:760px){ .dlbtn{font-size:10px;padding:9px 12px;letter-spacing:.1em;} }
 
   @media (max-width:760px){
     .shot img{max-height:60vh;max-width:88vw;}
@@ -306,6 +312,7 @@
 <div id="hint">scorri &darr;</div>
 
 <div id="light"><div class="x" id="lightX">&times;</div>
+  <a class="dlbtn" id="lightDl" download rel="noopener" aria-label="Scarica la foto">&#8595;&nbsp;Scarica</a>
   <button class="navarrow prev" id="lightPrev" aria-label="precedente">&#8249;</button>
   <img id="lightImg" alt="">
   <button class="navarrow next" id="lightNext" aria-label="successiva">&#8250;</button>
@@ -378,6 +385,7 @@
         curtains=document.getElementById('curtains');
   const lightEl=document.getElementById('light'), lightImg=document.getElementById('lightImg'),
         lightCap=document.getElementById('lightCap'), lightX=document.getElementById('lightX'),
+        lightDl=document.getElementById('lightDl'),
         lightPrev=document.getElementById('lightPrev'), lightNext=document.getElementById('lightNext');
   const focusEl=document.getElementById('focus'), focusFrame=document.getElementById('focusFrame'),
         focusMeta=document.getElementById('focusMeta'), focusClose=document.getElementById('focusClose');
@@ -457,7 +465,9 @@
       inner=`${ghost}<canvas class="half reveal" data-full="${s.photo}" style="aspect-ratio:${s.ratio||1}"></canvas>${tag}`;
     }
     else if(s.t==='contact'){
-      const f=s.srcs.map(src=>`<div class="f" data-full="${src}"><img src="${src}" alt="" loading="lazy" decoding="async"></div>`).join('');
+      const f=s.srcs.map(src=>{ const dl=src.replace('/web/','/dl/').replace(/\.webp$/,'.jpg');
+        const name='Chiara-Cucciardi-'+src.split('/').pop().replace(/\.webp$/,'.jpg');
+        return `<div class="f" data-full="${src}" data-dl="${dl}" data-name="${name}"><img src="${src}" alt="" loading="lazy" decoding="async"></div>`; }).join('');
       inner=`<div class="chead reveal"><span class="ct">${s.title||'provini'}</span><span class="cp">${s.cap||''}</span></div><div class="contact reveal" style="--d:.1s">${f}</div>`;
     }
     else if(s.t==='video'){ const v=VIDEOS[s.v];
@@ -486,7 +496,7 @@
     if(s.t==='halftone'){ const cv=sec.querySelector('.half'); halftones.push(()=>halftone(cv,s.photo,s.cell||7,s.ink||'#1733cc',s.paper||'#f3efe4')); }
     sec.querySelectorAll('[data-vi]').forEach(x=>x.addEventListener('click',()=>{ openFocus(VIDEOS[+x.dataset.vi]); }));
     sec.querySelectorAll('[data-full]').forEach(x=>{ const gx=GALLERY.length;
-      GALLERY.push({src:x.dataset.full, cap:s.sub||''});
+      GALLERY.push({src:x.dataset.full, cap:s.sub||'', dl:x.dataset.dl||'', name:x.dataset.name||''});
       x.addEventListener('click',()=>openLight(gx)); });
     secs.push({ ...s, el:sec });
 
@@ -573,7 +583,9 @@
   const modalOpen=()=>lightEl.classList.contains('on')||focusEl.classList.contains('on');
   /* lightbox galleria: frecce per scorrere tutte le foto del sito, nell'ordine */
   let gi=0;
-  function showG(){ const g=GALLERY[gi]; if(!g) return; lightImg.src=g.src; lightCap.innerHTML=g.cap||''; }
+  function showG(){ const g=GALLERY[gi]; if(!g) return; lightImg.src=g.src; lightCap.innerHTML=g.cap||'';
+    if(g.dl){ lightDl.href=g.dl; lightDl.setAttribute('download', g.name||''); lightDl.style.display='inline-flex'; }
+    else { lightDl.style.display='none'; lightDl.removeAttribute('href'); } }
   function openLight(i){ gi=i; showG(); lightEl.classList.add('on'); }
   function navG(d){ if(!GALLERY.length) return; gi=(gi+d+GALLERY.length)%GALLERY.length; showG(); }
   function closeLight(){ lightEl.classList.remove('on'); lightImg.src=''; }
